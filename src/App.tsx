@@ -11,6 +11,7 @@ import {
 import { Header } from './components/Header'
 import { FeatureGrid } from './components/FeatureGrid'
 import type { TabId, FeatureItem } from './types/feature'
+import { StarRegular, StarFilled } from '@fluentui/react-icons'
 // 基本設定の個別機能コンポーネント
 import { PageSettingsFeature } from './components/features/basic/PageSettingsFeature'
 import { PaperSizeFeature } from './components/features/basic/PaperSizeFeature'
@@ -42,6 +43,7 @@ import { TemplateTextFeature } from './components/features/template/TemplateText
 import { SymbolSeriesFeature } from './components/features/template/SymbolSeriesFeature'
 
 const TABS: { id: TabId; label: string }[] = [
+  { id: 'favorites',  label: '★' },
   { id: 'basic',      label: '基本設定' },
   { id: 'typography', label: '文字組' },
   { id: 'border',     label: '枠' },
@@ -142,13 +144,66 @@ const useStyles = makeStyles({
     width: '100%',
     boxSizing: 'border-box',
   },
+  favRow: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '6px',
+  },
+  favBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    background: 'transparent',
+    border: '1px solid #c5dcf5',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '11px',
+    color: '#4a7cb5',
+    padding: '3px 8px',
+    fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
+    ':hover': { backgroundColor: '#dce8f7' },
+  },
+  favBtnActive: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    backgroundColor: '#fff8c5',
+    border: '1px solid #e8c840',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '11px',
+    color: '#7a6000',
+    padding: '3px 8px',
+    fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
+    ':hover': { backgroundColor: '#ffed80' },
+  },
 })
 
 export default function App() {
   const styles = useStyles()
-  const [activeTab, setActiveTab] = useState<TabId>('basic')
+  const [activeTab, setActiveTab] = useState<TabId>('favorites')
   // 選択中の機能（null = メイン画面、non-null = 設定画面）
   const [currentFeature, setCurrentFeature] = useState<FeatureItem | null>(null)
+
+  // お気に入り機能ID一覧（localStorage で永続化）
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('panel-word-favorites')
+      return saved ? (JSON.parse(saved) as string[]) : []
+    } catch {
+      return []
+    }
+  })
+
+  const toggleFavorite = (featureId: string) => {
+    setFavorites((prev) => {
+      const next = prev.includes(featureId)
+        ? prev.filter((id) => id !== featureId)
+        : [...prev, featureId]
+      try { localStorage.setItem('panel-word-favorites', JSON.stringify(next)) } catch { /* noop */ }
+      return next
+    })
+  }
 
   // 選択した機能 ID に対応するコンポーネントを返す
   const renderSettingsComponent = (feature: FeatureItem) => {
@@ -218,12 +273,25 @@ export default function App() {
         <div className={styles.body} role="tabpanel">
           {currentFeature === null ? (
             // メイン画面：現在のタブの機能カードグリッドを表示
-            <FeatureGrid tabId={activeTab} onSelect={setCurrentFeature} />
+            <FeatureGrid tabId={activeTab} onSelect={setCurrentFeature} favorites={favorites} onToggleFavorite={toggleFavorite} />
           ) : (
-            // 設定画面：白背景パネルで包んで表示
-            <div className={styles.featurePanel}>
-              {renderSettingsComponent(currentFeature)}
-            </div>
+            // 設定画面：お気に入りボタン ＋ 白背景パネル
+            <>
+              <div className={styles.favRow}>
+                <button
+                  className={favorites.includes(currentFeature.id) ? styles.favBtnActive : styles.favBtn}
+                  onClick={() => toggleFavorite(currentFeature.id)}
+                >
+                  {favorites.includes(currentFeature.id)
+                    ? <StarFilled fontSize={13} />
+                    : <StarRegular fontSize={13} />}
+                  {favorites.includes(currentFeature.id) ? 'お気に入り登録済み' : 'お気に入りに追加'}
+                </button>
+              </div>
+              <div className={styles.featurePanel}>
+                {renderSettingsComponent(currentFeature)}
+              </div>
+            </>
           )}
         </div>
 

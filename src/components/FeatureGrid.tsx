@@ -9,6 +9,8 @@ import {
   tokens,
 } from '@fluentui/react-components'
 import {
+  StarRegular,
+  StarFilled,
   InfoRegular,
   DocumentRegular,
   TextFontSizeRegular,
@@ -68,14 +70,14 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'page-margin',
     label: 'ページ余白',
     tabId: 'basic',
-    icon: <BorderAllRegular fontSize={24} />,
+    icon: <LayoutColumnTwoRegular fontSize={24} />,
     tooltip: 'ページの上下左右の余白をmm単位で設定します',
   },
   {
     id: 'columns',
     label: '段組み',
     tabId: 'basic',
-    icon: <LayoutColumnTwoRegular fontSize={24} />,
+    icon: <BorderAllRegular fontSize={24} />,
     tooltip: '段組みの段数と列間隔を設定します',
   },
 
@@ -231,6 +233,8 @@ const ALL_FEATURES: FeatureItem[] = [
 interface FeatureGridProps {
   tabId: TabId
   onSelect: (feature: FeatureItem) => void
+  favorites: string[]
+  onToggleFavorite: (featureId: string) => void
 }
 
 const useStyles = makeStyles({
@@ -243,6 +247,7 @@ const useStyles = makeStyles({
     boxSizing: 'border-box',
   },
   card: {
+    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -289,16 +294,63 @@ const useStyles = makeStyles({
     lineHeight: '1.2',
     wordBreak: 'keep-all',
   },
+  starBtn: {
+    position: 'absolute',
+    top: '2px',
+    right: '2px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    padding: '2px',
+    color: '#c8d8ea',
+    display: 'flex',
+    alignItems: 'center',
+    lineHeight: '1',
+    ':hover': { color: '#e8c840' },
+  },
+  starBtnActive: {
+    position: 'absolute',
+    top: '2px',
+    right: '2px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    padding: '2px',
+    color: '#e8c840',
+    display: 'flex',
+    alignItems: 'center',
+    lineHeight: '1',
+    ':hover': { color: '#c0a000' },
+  },
+  emptyState: {
+    gridColumn: '1 / -1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '32px 16px',
+    color: '#4a7cb5',
+    textAlign: 'center',
+    gap: '8px',
+  },
 })
 
-export function FeatureGrid({ tabId, onSelect }: FeatureGridProps) {
+export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite }: FeatureGridProps) {
   const styles = useStyles()
 
-  // 現在のタブに対応する機能カードのみ抽出
-  const features = ALL_FEATURES.filter((f) => f.tabId === tabId)
+  // 現在のタブに対応する機能カードを抽出（お気に入りタブはIDで絞り込み）
+  const features = tabId === 'favorites'
+    ? ALL_FEATURES.filter((f) => favorites.includes(f.id))
+    : ALL_FEATURES.filter((f) => f.tabId === tabId)
 
   return (
     <div className={styles.grid} role="list">
+      {tabId === 'favorites' && features.length === 0 && (
+        <div className={styles.emptyState}>
+          <span style={{ fontSize: '28px', color: '#e8c840' }}>★</span>
+          <Text size={200}>カードの設定画面で ★ をクリックするとここに追加されます</Text>
+        </div>
+      )}
       {features.map((feature) => (
         <Tooltip
           key={feature.id}
@@ -321,6 +373,15 @@ export function FeatureGrid({ tabId, onSelect }: FeatureGridProps) {
             }}
             aria-label={`${feature.label}・${feature.tooltip}`}
           >
+            <button
+              className={favorites.includes(feature.id) ? styles.starBtnActive : styles.starBtn}
+              onClick={(e) => { e.stopPropagation(); onToggleFavorite(feature.id) }}
+              aria-label={favorites.includes(feature.id) ? 'お気に入りから削除' : 'お気に入りに追加'}
+            >
+              {favorites.includes(feature.id)
+                ? <StarFilled fontSize={12} />
+                : <StarRegular fontSize={12} />}
+            </button>
             <span className={styles.icon}>{feature.icon}</span>
             <Text className={styles.label}>{feature.label}</Text>
           </div>

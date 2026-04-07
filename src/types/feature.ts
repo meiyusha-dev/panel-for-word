@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 
 /** タブID — 各タブを一意に識別する */
-export type TabId = 'basic' | 'typography' | 'border' | 'formula' | 'template'
+export type TabId = 'favorites' | 'basic' | 'typography' | 'border' | 'formula' | 'template'
 
 /** 機能カード1枚分のデータ型 */
 export type FeatureItem = {

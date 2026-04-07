@@ -234,7 +234,6 @@ export default function App() {
       case 'formula-accent':      return <AccentFormulaFeature />
       case 'formula-operator':    return <OperatorFormulaFeature />
       case 'formula-matrix':      return <MatrixFormulaFeature />
-      case 'formula-math-symbols': return <SymbolsFormulaFeature />
       // 定型文
       case 'template-text':       return <TemplateTextFeature />
       case 'template-symbol':     return <SymbolSeriesFeature />

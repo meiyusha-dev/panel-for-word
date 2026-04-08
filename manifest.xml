@@ -11,12 +11,12 @@
   <DefaultLocale>ja-JP</DefaultLocale>
   <DisplayName DefaultValue="Word Panel" />
   <Description DefaultValue="Word custom task pane" />
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-80.png" />
-  <SupportUrl DefaultValue="https://localhost:3000" />
+  <IconUrl DefaultValue="https://otayoshino.github.io/panel-for-word/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://otayoshino.github.io/panel-for-word/assets/icon-80.png" />
+  <SupportUrl DefaultValue="https://otayoshino.github.io/panel-for-word/" />
 
   <AppDomains>
-    <AppDomain>https://localhost:3000</AppDomain>
+    <AppDomain>https://otayoshino.github.io</AppDomain>
   </AppDomains>
 
   <Hosts>
@@ -24,7 +24,7 @@
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:3000" />
+    <SourceLocation DefaultValue="https://otayoshino.github.io/panel-for-word/" />
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>

@@ -32,7 +32,7 @@ const FRAC_ITEMS: { value: FracType; label: string; icon: ReactNode }[] = [
   },
   {
     value: 'lin',
-    label: '線形（a/b）',
+    label: '線形（a/b）', // 半角
     icon: (
       <span style={{ fontSize: '13px', fontWeight: '600', fontFamily: 'serif' }}>
         a/b
@@ -64,7 +64,7 @@ const PRESET_FRACS: PresetFrac[] = [
     ),
   },
   {
-    label: 'Δy/Δx',
+    label: '大文字デルタy/大文字デルタx',
     num: 'Δy', den: 'Δx',
     icon: (
       <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1', gap: '1px', fontSize: '12px', fontFamily: 'serif' }}>
@@ -74,7 +74,7 @@ const PRESET_FRACS: PresetFrac[] = [
     ),
   },
   {
-    label: '∂y/∂x',
+    label: 'パーシャルy/パーシャルx',
     num: '∂y', den: '∂x',
     icon: (
       <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1', gap: '1px', fontSize: '12px', fontFamily: 'serif', fontStyle: 'italic' }}>
@@ -84,7 +84,7 @@ const PRESET_FRACS: PresetFrac[] = [
     ),
   },
   {
-    label: 'δy/δx',
+    label: 'デルタy/デルタx',
     num: 'δy', den: 'δx',
     icon: (
       <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1', gap: '1px', fontSize: '12px', fontFamily: 'serif', fontStyle: 'italic' }}>

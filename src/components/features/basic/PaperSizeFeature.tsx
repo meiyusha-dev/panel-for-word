@@ -1,14 +1,11 @@
 // src/components/features/basic/PaperSizeFeature.tsx
-// 用紙サイズと組方向（横組み/縦組み）の設定
+// 用紙サイズの設定
 
 import { useState } from 'react'
 import {
   Button,
   Field,
   Select,
-  Radio,
-  RadioGroup,
-  Text,
   makeStyles,
   tokens,
 } from '@fluentui/react-components'
@@ -59,7 +56,6 @@ export function PaperSizeFeature() {
   const styles = useStyles()
   const { runWord, status } = useWordRun()
   const [paperSize, setPaperSize] = useState('A4縦')
-  const [textDir, setTextDir] = useState<'horizontal' | 'vertical'>('horizontal')
 
   const applyPaperSize = () =>
     runWord(async (context) => {
@@ -74,22 +70,6 @@ export function PaperSizeFeature() {
       await context.sync()
     })
 
-  const applyTextDirection = (dir: 'horizontal' | 'vertical') => {
-    setTextDir(dir)
-    runWord(async (context) => {
-      const paragraphs = context.document.getSelection().paragraphs
-      paragraphs.load('items')
-      await context.sync()
-      paragraphs.items.forEach((p) => {
-        // textDirection は @types/office-js 未定義だが Word API では有効
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(p as unknown as Record<string, unknown>)['textDirection'] =
-          dir === 'horizontal' ? 'LeftToRight' : 'TopToBottom'
-      })
-      await context.sync()
-    })
-  }
-
   return (
     <div className={styles.root}>
       <div className={styles.row}>
@@ -102,17 +82,6 @@ export function PaperSizeFeature() {
         </Field>
         <Button appearance="primary" onClick={applyPaperSize}>設定</Button>
       </div>
-      <RadioGroup
-        layout="horizontal"
-        value={textDir}
-        onChange={(_, d) => applyTextDirection(d.value as 'horizontal' | 'vertical')}
-      >
-        <Radio value="horizontal" label="横組み" />
-        <Radio value="vertical" label="縦組み" />
-      </RadioGroup>
-      <Text size={100} className={styles.hint}>
-        組方向は選択中の段落に適用されます。セクション全体への縦組みはAPI制限のため完全には適用できません。
-      </Text>
       <StatusBar status={status} />
     </div>
   )

@@ -40,6 +40,13 @@ export default defineConfig({
     },
   ],
   base: '/panel-for-word/',
+  resolve: {
+    alias: {
+      // kuromoji の DictionaryLoader が require("path") を使うため、
+      // ブラウザ環境で動く最小シムに差し替える（path-browserify は https:// を壊すため不可）
+      path: path.resolve('./src/utils/path-browser-shim.js'),
+    },
+  },
   server: {
     port: 3000,
     https: httpsConfig,

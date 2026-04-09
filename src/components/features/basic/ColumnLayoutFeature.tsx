@@ -36,28 +36,35 @@ export function ColumnLayoutFeature() {
 
   const applyColumns = () =>
     runWord(async () => {
+      // Run 1: 段数設定のみ（setCount後プロキシが無効になるため分離）
       await Word.run(async (context) => {
         const sections = context.document.sections
         sections.load('items')
         await context.sync()
-        const textColumns = sections.items[0].pageSetup.textColumns
-        // 段数設定
-        textColumns.setCount(colCount)
-        if (colCount > 1) {
-          textColumns.setIsEvenlySpaced(false)
-        }
+        sections.items[0].pageSetup.textColumns.setCount(colCount)
         await context.sync()
-        // 列間隔設定（段数＞1のみ）
-        if (colCount > 1) {
-          textColumns.load('items')
+      })
+
+      // Run 2: 列間隔設定（段数＞1のみ）
+      if (colCount > 1) {
+        await Word.run(async (context) => {
+          const sections = context.document.sections
+          sections.load('items')
+          await context.sync()
+          const cols = sections.items[0].pageSetup.textColumns
+          // 不均等間隔モードに切替（setCountとは別syncにすることでプロキシ有効）
+          cols.setIsEvenlySpaced(false)
+          await context.sync()
+          // items を再ロード
+          cols.load('items')
           await context.sync()
           const spacePt = mm2pt(colSpacing)
-          for (let i = 0; i < textColumns.items.length - 1; i++) {
-            textColumns.items[i].spaceAfter = spacePt
+          for (let i = 0; i < cols.items.length - 1; i++) {
+            cols.items[i].spaceAfter = spacePt
           }
           await context.sync()
-        }
-      })
+        })
+      }
     })
 
   return (

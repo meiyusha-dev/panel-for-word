@@ -18,6 +18,7 @@ import { PaperSizeFeature } from './components/features/basic/PaperSizeFeature'
 import { FontSizeFeature } from './components/features/basic/FontSizeFeature'
 import { PageMarginFeature } from './components/features/basic/PageMarginFeature'
 import { ColumnLayoutFeature } from './components/features/basic/ColumnLayoutFeature'
+import { CharsLinesFeature } from './components/features/basic/CharsLinesFeature'
 // 文字組の個別機能コンポーネント
 import { IndentFeature } from './components/features/typography/IndentFeature'
 import { LineSpacingFeature } from './components/features/typography/LineSpacingFeature'
@@ -110,6 +111,22 @@ const useStyles = makeStyles({
     ':hover': {
       backgroundColor: 'rgba(255,255,255,0.15)',
       color: '#b8d4f0',
+    },
+  },
+  backButton: {
+    padding: '6px 10px',
+    fontSize: '9px',
+    color: '#ffffff',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
+    fontWeight: '400',
+    appearance: 'none',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    ':hover': {
+      backgroundColor: 'rgba(255,255,255,0.15)',
     },
   },
   tabSelected: {
@@ -205,6 +222,11 @@ export default function App() {
     })
   }
 
+  const reorderFavorites = (newOrder: string[]) => {
+    setFavorites(newOrder)
+    try { localStorage.setItem('panel-word-favorites', JSON.stringify(newOrder)) } catch { /* noop */ }
+  }
+
   // 選択した機能 ID に対応するコンポーネントを返す
   const renderSettingsComponent = (feature: FeatureItem) => {
     switch (feature.id) {
@@ -214,6 +236,7 @@ export default function App() {
       case 'font-size':           return <FontSizeFeature />
       case 'page-margin':         return <PageMarginFeature />
       case 'columns':             return <ColumnLayoutFeature />
+      case 'chars-lines':         return <CharsLinesFeature />
       // 文字組
       case 'indent':              return <IndentFeature />
       case 'line-spacing':        return <LineSpacingFeature />
@@ -245,16 +268,16 @@ export default function App() {
     <FluentProvider theme={meiyushaTheme} className={styles.provider}>
       <div className={styles.root}>
 
-        {/* ── 共通ヘッダー：アドイン名 or 戻るボタン ── */}
+        {/* ── 共通ヘッダー：アドイン名を常時表示 ── */}
         <Header
           currentFeature={currentFeature}
           onBack={() => setCurrentFeature(null)}
         />
 
-        {/* ── タブバー：メイン画面のみ表示 ── */}
-        {currentFeature === null && (
-          <div className={styles.tabBar} role="tablist">
-            {TABS.map((tab) => (
+        {/* ── タブバー：メイン画面はタブ、機能画面は戻るボタンで高さを維持 ── */}
+        <div className={styles.tabBar} role={currentFeature === null ? 'tablist' : undefined}>
+          {currentFeature === null ? (
+            TABS.map((tab) => (
               <button
                 key={tab.id}
                 role="tab"
@@ -264,15 +287,22 @@ export default function App() {
               >
                 {tab.label}
               </button>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <button
+              className={styles.backButton}
+              onClick={() => setCurrentFeature(null)}
+            >
+              ← 戻る
+            </button>
+          )}
+        </div>
 
         {/* ── ボディ ── */}
         <div className={styles.body} role="tabpanel">
           {currentFeature === null ? (
             // メイン画面：現在のタブの機能カードグリッドを表示
-            <FeatureGrid tabId={activeTab} onSelect={setCurrentFeature} favorites={favorites} onToggleFavorite={toggleFavorite} />
+            <FeatureGrid tabId={activeTab} onSelect={setCurrentFeature} favorites={favorites} onToggleFavorite={toggleFavorite} onReorderFavorites={reorderFavorites} />
           ) : (
             // 設定画面：お気に入りボタン ＋ 白背景パネル
             <>

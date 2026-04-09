@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import {
   Text,
   makeStyles,
+  mergeClasses,
   tokens,
 } from '@fluentui/react-components'
 import {
@@ -298,6 +299,7 @@ interface FeatureGridProps {
   onSelect: (feature: FeatureItem) => void
   favorites: string[]
   onToggleFavorite: (featureId: string) => void
+  onReorderFavorites?: (newOrder: string[]) => void
 }
 
 const useStyles = makeStyles({
@@ -396,6 +398,14 @@ const useStyles = makeStyles({
     textAlign: 'center',
     gap: '8px',
   },
+  cardDragOver: {
+    border: '2px dashed #1e4d8c',
+    backgroundColor: '#d8eaff',
+    transform: 'scale(1.05)',
+  },
+  cardDragging: {
+    opacity: '0.4',
+  },
   tooltipText: {
     position: 'fixed',
     backgroundColor: '#333',
@@ -415,11 +425,14 @@ const useStyles = makeStyles({
 
 type TooltipState = { id: string; x: number; y: number; cardTop: number; text: string }
 
-export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite }: FeatureGridProps) {
+export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onReorderFavorites }: FeatureGridProps) {
   const styles = useStyles()
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
+  const dragSourceId = useRef<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
 
   // 描画後にツールチップの寜はみ出しを補正
   useLayoutEffect(() => {
@@ -466,9 +479,41 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite }: Fe
     setTooltip(null)
   }
 
-  // 現在のタブに対応する機能カードを抽出（お気に入りタブはIDで絞り込み）
+  // ドラッグ操作（お気に入りタブのみ）
+  const handleDragStart = (featureId: string) => {
+    dragSourceId.current = featureId
+    setDraggingId(featureId)
+    handleMouseLeave()
+  }
+  const handleDragOver = (e: React.DragEvent, featureId: string) => {
+    e.preventDefault()
+    if (dragSourceId.current !== featureId) setDragOverId(featureId)
+  }
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault()
+    const sourceId = dragSourceId.current
+    if (!sourceId || sourceId === targetId || !onReorderFavorites) return
+    const newOrder = [...favorites]
+    const fromIdx = newOrder.indexOf(sourceId)
+    const toIdx = newOrder.indexOf(targetId)
+    if (fromIdx === -1 || toIdx === -1) return
+    newOrder.splice(fromIdx, 1)
+    newOrder.splice(toIdx, 0, sourceId)
+    onReorderFavorites(newOrder)
+    setDragOverId(null)
+    setDraggingId(null)
+    dragSourceId.current = null
+  }
+  const handleDragEnd = () => {
+    setDragOverId(null)
+    setDraggingId(null)
+    dragSourceId.current = null
+  }
+
+  // 現在のタブに対応する機能カードを抽出
+  // お気に入りタブは favorites 配列の順序を維持
   const features = tabId === 'favorites'
-    ? ALL_FEATURES.filter((f) => favorites.includes(f.id))
+    ? favorites.map((id) => ALL_FEATURES.find((f) => f.id === id)).filter((f): f is FeatureItem => f !== undefined)
     : ALL_FEATURES.filter((f) => f.tabId === tabId)
 
   return (
@@ -485,10 +530,19 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite }: Fe
             key={feature.id}
             role="listitem"
             tabIndex={0}
-            className={styles.card}
+            className={mergeClasses(
+              styles.card,
+              tabId === 'favorites' && dragOverId === feature.id && styles.cardDragOver,
+              tabId === 'favorites' && draggingId === feature.id && styles.cardDragging,
+            )}
+            draggable={tabId === 'favorites'}
+            onDragStart={tabId === 'favorites' ? () => handleDragStart(feature.id) : undefined}
+            onDragOver={tabId === 'favorites' ? (e) => handleDragOver(e, feature.id) : undefined}
+            onDrop={tabId === 'favorites' ? (e) => handleDrop(e, feature.id) : undefined}
+            onDragEnd={tabId === 'favorites' ? handleDragEnd : undefined}
             onMouseEnter={(e) => handleMouseEnter(e, feature)}
             onMouseLeave={handleMouseLeave}
-            onClick={() => onSelect(feature)}
+            onClick={() => { if (!dragSourceId.current) onSelect(feature) }}
             onKeyDown={(e) => {
               // Enter / Space キーでもカード選択を発火
               if (e.key === 'Enter' || e.key === ' ') {

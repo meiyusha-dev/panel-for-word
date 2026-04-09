@@ -1,5 +1,5 @@
 // src/components/features/basic/ColumnLayoutFeature.tsx
-// 段組み（段数・列間隔）の設定 — OOXML の w:cols 要素を直接編集して適用する
+// 段組み（段数・列間隔）の設定 — pageSetup.textColumns API（WordApiDesktop 1.3）を使用
 
 import { useState } from 'react'
 import { Button, Field, SpinButton, makeStyles, tokens } from '@fluentui/react-components'
@@ -35,40 +35,29 @@ export function ColumnLayoutFeature() {
   const [colSpacing, setColSpacing] = useState(10)
 
   const applyColumns = () =>
-    runWord(async (context) => {
-      const body = context.document.body
-      const ooxmlResult = body.getOoxml()
-      await context.sync()
-
-      // w:space は twip（1/20pt）単位
-      const spaceTwips = Math.round(mm2pt(colSpacing) * 20)
-      const colsTag = `<w:cols w:equalWidth="1" w:num="${colCount}" w:space="${spaceTwips}"/>`
-      let xml: string = ooxmlResult.value
-
-      const SECT_CLOSE = '</w:sectPr>'
-      const lastClose = xml.lastIndexOf(SECT_CLOSE)
-      if (lastClose === -1) return
-
-      const lastOpen = xml.lastIndexOf('<w:sectPr', lastClose)
-      if (lastOpen === -1) return
-
-      const sectPrXml = xml.slice(lastOpen, lastClose + SECT_CLOSE.length)
-      let newSectPrXml: string
-
-      if (/\bw:cols\b/.test(sectPrXml)) {
-        // 既存の w:cols を置換（自己終了タグ → 子要素ありの順で試行）
-        newSectPrXml = sectPrXml.replace(/<w:cols[^>]*\/>/, colsTag)
-        if (newSectPrXml === sectPrXml) {
-          newSectPrXml = sectPrXml.replace(/<w:cols[\s\S]*?<\/w:cols>/, colsTag)
+    runWord(async () => {
+      await Word.run(async (context) => {
+        const sections = context.document.sections
+        sections.load('items')
+        await context.sync()
+        const textColumns = sections.items[0].pageSetup.textColumns
+        // 段数設定
+        textColumns.setCount(colCount)
+        if (colCount > 1) {
+          textColumns.setIsEvenlySpaced(false)
         }
-      } else {
-        // w:cols なし → </w:sectPr> 直前に挿入
-        newSectPrXml = sectPrXml.replace(SECT_CLOSE, colsTag + SECT_CLOSE)
-      }
-
-      xml = xml.slice(0, lastOpen) + newSectPrXml + xml.slice(lastClose + SECT_CLOSE.length)
-      body.insertOoxml(xml, 'Replace')
-      await context.sync()
+        await context.sync()
+        // 列間隔設定（段数＞1のみ）
+        if (colCount > 1) {
+          textColumns.load('items')
+          await context.sync()
+          const spacePt = mm2pt(colSpacing)
+          for (let i = 0; i < textColumns.items.length - 1; i++) {
+            textColumns.items[i].spaceAfter = spacePt
+          }
+          await context.sync()
+        }
+      })
     })
 
   return (

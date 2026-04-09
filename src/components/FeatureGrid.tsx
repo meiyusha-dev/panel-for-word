@@ -71,18 +71,16 @@ const ALL_FEATURES: FeatureItem[] = [
     tabId: 'basic',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* 中央の縦区切り線 */}
-        <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        {/* 左段の横棒 */}
-        <line x1="3" y1="7"  x2="10" y2="7"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="3" y1="11" x2="10" y2="11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="3" y1="15" x2="10" y2="15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="3" y1="19" x2="8"  y2="19" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        {/* 右段の横棒 */}
-        <line x1="14" y1="7"  x2="21" y2="7"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="14" y1="11" x2="21" y2="11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="14" y1="15" x2="21" y2="15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="14" y1="19" x2="19" y2="19" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        {/* 左段 */}
+        <line x1="2" y1="6"  x2="9" y2="6"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="2" y1="10" x2="9" y2="10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="2" y1="14" x2="9" y2="14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="2" y1="18" x2="7" y2="18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        {/* 右段 */}
+        <line x1="15" y1="6"  x2="22" y2="6"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="15" y1="10" x2="22" y2="10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="15" y1="14" x2="22" y2="14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="15" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     ),
     tooltip: '段組みの段数と列間隔を設定します',

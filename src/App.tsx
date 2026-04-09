@@ -23,6 +23,7 @@ import { IndentFeature } from './components/features/typography/IndentFeature'
 import { LineSpacingFeature } from './components/features/typography/LineSpacingFeature'
 import { TableInsertFeature } from './components/features/typography/TableInsertFeature'
 import { FontReplaceFeature } from './components/features/typography/FontReplaceFeature'
+import { RubyFeature } from './components/features/typography/RubyFeature'
 // 枠の個別機能コンポーネント
 import { ImageInsertFeature } from './components/features/frame/ImageInsertFeature'
 import { ContentControlFeature } from './components/features/frame/ContentControlFeature'
@@ -218,6 +219,7 @@ export default function App() {
       case 'line-spacing':        return <LineSpacingFeature />
       case 'table-insert':        return <TableInsertFeature />
       case 'font-replace':        return <FontReplaceFeature />
+      case 'auto-ruby':           return <RubyFeature />
       // 枠
       case 'image-insert':        return <ImageInsertFeature />
       case 'content-control':     return <ContentControlFeature />

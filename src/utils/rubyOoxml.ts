@@ -52,14 +52,7 @@ function buildPlainRun(text: string): string {
   return `<w:r><w:t xml:space="preserve">${escapeXml(text)}</w:t></w:r>`
 }
 
-/** RubyPair 配列から挿入用 OOXML pkg:package 文字列を組み立て */
-export function buildRubyOoxml(pairs: RubyPair[]): string {
-  const content = pairs
-    .map(({ base, reading, hasKanji }) =>
-      hasKanji ? buildRubyElement(base, reading) : buildPlainRun(base),
-    )
-    .join('')
-
+function buildOoxmlPackage(content: string): string {
   return `<pkg:package xmlns:pkg="http://schemas.microsoft.com/office/2006/xmlPackage">
   <pkg:part pkg:name="/_rels/.rels" pkg:contentType="application/vnd.openxmlformats-package.relationships+xml">
     <pkg:xmlData>
@@ -76,4 +69,30 @@ export function buildRubyOoxml(pairs: RubyPair[]): string {
     </pkg:xmlData>
   </pkg:part>
 </pkg:package>`
+}
+
+/** RubyPair 配列から挿入用 OOXML pkg:package 文字列を組み立て（自動ルビ用） */
+export function buildRubyOoxml(pairs: RubyPair[]): string {
+  const content = pairs
+    .map(({ base, reading, hasKanji }) =>
+      hasKanji ? buildRubyElement(base, reading) : buildPlainRun(base),
+    )
+    .join('')
+  return buildOoxmlPackage(content)
+}
+
+/** 選択テキスト全体に任意のルビを付ける OOXML を生成（任意ルビ用） */
+export function buildManualRubyOoxml(base: string, reading: string): string {
+  return buildOoxmlPackage(buildRubyElement(base, reading))
+}
+
+/**
+ * OOXML 文字列中の <w:ruby> タグを解除し、<w:rubyBase> 内のテキストだけ残す。
+ * Word から getOoxml() で取得した文字列をそのまま渡してよい。
+ */
+export function removeRubyFromOoxml(ooxml: string): string {
+  return ooxml.replace(
+    /<w:ruby>[\s\S]*?<w:rubyBase>([\s\S]*?)<\/w:rubyBase>\s*<\/w:ruby>/g,
+    '$1',
+  )
 }

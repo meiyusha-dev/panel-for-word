@@ -119,17 +119,15 @@ const ALL_FEATURES: FeatureItem[] = [
   },
   {
     id: 'auto-ruby',
-    label: '自動ルビ',
+    label: 'ルビ',
     tabId: 'typography',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* ルビ文字（上部・小さい） */}
         <text x="12" y="9" textAnchor="middle" fontSize="6" fill="currentColor" fontFamily="serif">漢</text>
-        {/* ベース文字（下部・大きい） */}
         <text x="12" y="20" textAnchor="middle" fontSize="11" fill="currentColor" fontFamily="serif">漢</text>
       </svg>
     ),
-    tooltip: '選択したテキストの漢字にルビ（ふりがな）を自動で振ります',
+    tooltip: '漢字への自動ルビ・任意ルビの適用、ルビ解除ができます',
   },
 
   // ── 枠 ───────────────────────────────────────────────────────────────

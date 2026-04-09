@@ -225,7 +225,7 @@ export function ScriptFormulaFeature() {
         case 'sup':        mathContent = `<m:sSup>${e}${sup}</m:sSup>`; break
         case 'sub':        mathContent = `<m:sSub>${e}${sub}</m:sSub>`; break
         case 'subSup':     mathContent = `<m:sSubSup>${e}${sub}${sup}</m:sSubSup>`; break
-        case 'leftSubSup': mathContent = `<m:sSup><m:e><m:sPre>${sub}${sup}${e}</m:sPre></m:e>${sup}</m:sSup>`; break
+        case 'leftSubSup': mathContent = `<m:sPre>${sub}${sup}${e}</m:sPre>`; break
       }
       range.insertOoxml(makeOoxmlMath(mathContent), Word.InsertLocation.replace)
       await context.sync()

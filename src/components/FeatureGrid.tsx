@@ -123,7 +123,7 @@ const ALL_FEATURES: FeatureItem[] = [
     tabId: 'typography',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="12" y="9" textAnchor="middle" fontSize="6" fill="currentColor" fontFamily="serif">漢</text>
+        <text x="12" y="9" textAnchor="middle" fontSize="6" fill="currentColor" fontFamily="serif">・</text>
         <text x="12" y="20" textAnchor="middle" fontSize="11" fill="currentColor" fontFamily="serif">漢</text>
       </svg>
     ),

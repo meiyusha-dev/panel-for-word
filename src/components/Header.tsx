@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-// 共通ヘッダー — 画面状態に応じてアドイン名またはナビゲーション戻るボタンを表示
+// 共通ヘッダー — アドイン名を常に表示。機能画面では右端に戻るボタンを追加
 
 import { Button, Text, makeStyles } from '@fluentui/react-components'
 import type { FeatureItem } from '../types/feature'
@@ -17,6 +17,7 @@ const useStyles = makeStyles({
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     minHeight: '40px',
     flexShrink: 0,
   },
@@ -29,11 +30,10 @@ const useStyles = makeStyles({
   backButton: {
     color: '#ffffff',
     fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
-    fontSize: '13px',
+    fontSize: '12px',
     minWidth: 0,
-    paddingLeft: '0',
-    paddingRight: '4px',
-    // ホバー時も白文字を維持
+    paddingLeft: '6px',
+    paddingRight: '6px',
     ':hover': {
       color: '#ffffff',
       backgroundColor: 'rgba(255,255,255,0.15)',
@@ -49,20 +49,18 @@ export function Header({ currentFeature, onBack }: HeaderProps) {
 
   return (
     <div className={styles.header}>
-      {currentFeature === null ? (
-        // メイン画面：アドイン名を表示
-        <Text className={styles.title}>かんたんツールボックス</Text>
-      ) : (
-        // 設定画面：「← 機能名」の戻るボタンを表示
+      <Text className={styles.title}>かんたんツールボックス</Text>
+      {currentFeature !== null && (
         <Button
           appearance="subtle"
           className={styles.backButton}
           onClick={onBack}
           aria-label={`${currentFeature.label}から戻る`}
         >
-          ← {currentFeature.label}
+          ← 戻る
         </Button>
       )}
     </div>
   )
 }
+

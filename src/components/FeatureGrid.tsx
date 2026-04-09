@@ -39,7 +39,7 @@ const ALL_FEATURES: FeatureItem[] = [
   // ── 基本設定 ──────────────────────────────────────────────────────────
   {
     id: 'page-settings',
-    label: 'ページ設定',
+    label: 'ページ設定確認',
     tabId: 'basic',
     icon: <InfoRegular fontSize={24} />,
     tooltip: '現在のドキュメントの\n用紙サイズ・余白・文字サイズを確認します',
@@ -86,6 +86,25 @@ const ALL_FEATURES: FeatureItem[] = [
       </svg>
     ),
     tooltip: '段組みの段数と列間隔を設定します',
+  },
+  {
+    id: 'chars-lines',
+    label: '文字数・行数',
+    tabId: 'basic',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* 罫線（行を表す横線） */}
+        <line x1="3" y1="6"  x2="21" y2="6"  stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* 文字数を示す縦の目盛り */}
+        <line x1="8"  y1="3" x2="8"  y2="5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="14" y1="3" x2="14" y2="5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="20" y1="3" x2="20" y2="5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+    tooltip: '1行の文字数とページの行数を設定します',
   },
 
   // ── 文字組 ────────────────────────────────────────────────────────────

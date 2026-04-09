@@ -49,6 +49,8 @@ export function CharsLinesFeature() {
         <Field label="文字数">
           <SpinButton
             value={charsLine}
+            min={1}
+            max={200}
             step={1}
             onChange={(_, d) => setCharsLine(d.value ?? 40)}
           />
@@ -56,6 +58,8 @@ export function CharsLinesFeature() {
         <Field label="行数">
           <SpinButton
             value={linesPage}
+            min={1}
+            max={200}
             step={1}
             onChange={(_, d) => setLinesPage(d.value ?? 36)}
           />

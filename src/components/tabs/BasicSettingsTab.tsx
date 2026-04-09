@@ -5,8 +5,6 @@ import {
   Input,
   SpinButton,
   Select,
-  Radio,
-  RadioGroup,
   makeStyles,
   tokens,
   Text,
@@ -112,7 +110,6 @@ export function BasicSettingsTab() {
 
   const [docInfo, setDocInfo] = useState<string | null>(null)
   const [paperSize, setPaperSize] = useState('A4縦')
-  const [textDir, setTextDir] = useState<'horizontal' | 'vertical'>('horizontal')
   const [fontSize, setFontSize] = useState(10.5)
   const [marginTop, setMarginTop] = useState('')
   const [marginBottom, setMarginBottom] = useState('')
@@ -154,23 +151,6 @@ export function BasicSettingsTab() {
       setStatus(null)
     })
 
-  // ── 組方向設定 ───────────────────────────────────────────────────────────
-  const applyTextDirection = (dir: 'horizontal' | 'vertical') => {
-    setTextDir(dir)
-    runWord(async (context) => {
-      const paragraphs = context.document.getSelection().paragraphs
-      paragraphs.load('items')
-      await context.sync()
-      paragraphs.items.forEach((p) => {
-        // textDirection は @types/office-js 未定義だが Word API では有効
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(p as unknown as Record<string, unknown>)['textDirection'] =
-          dir === 'horizontal' ? 'LeftToRight' : 'TopToBottom'
-      })
-      await context.sync()
-    })
-  }
-
   // ── 用紙サイズ設定 ───────────────────────────────────────────────────────
   const applyPaperSize = () =>
     runWord(async (context) => {
@@ -195,42 +175,34 @@ export function BasicSettingsTab() {
 
   // ── 段組み設定 ───────────────────────────────────────────
   const applyColumns = () =>
-    runWord(async (context) => {
-      // document-level sectPr を直接操作するため context.document.body を使用
-      const body = context.document.body
-      const ooxmlResult = body.getOoxml()
-      await context.sync()
-
-      // w:space は twip（1/20pt）単位
-      const spaceTwips = Math.round(mm2pt(colSpacing) * 20)
-      const colsTag = `<w:cols w:equalWidth="1" w:num="${colCount}" w:space="${spaceTwips}"/>`
-      let xml: string = ooxmlResult.value
-
-      const SECT_CLOSE = '</w:sectPr>'
-      const lastClose = xml.lastIndexOf(SECT_CLOSE)
-      if (lastClose === -1) return
-
-      const lastOpen = xml.lastIndexOf('<w:sectPr', lastClose)
-      if (lastOpen === -1) return
-
-      // document-level sectPr の文字列を切り出して操作
-      const sectPrXml = xml.slice(lastOpen, lastClose + SECT_CLOSE.length)
-      let newSectPrXml: string
-
-      if (/\bw:cols\b/.test(sectPrXml)) {
-        // 既存の w:cols を置換（自己終了タグ → 子要素ありの順で試行）
-        newSectPrXml = sectPrXml.replace(/<w:cols[^>]*\/>/, colsTag)
-        if (newSectPrXml === sectPrXml) {
-          newSectPrXml = sectPrXml.replace(/<w:cols[\s\S]*?<\/w:cols>/, colsTag)
+    runWord(async () => {
+      // 第1ラン: 段数設定
+      await Word.run(async (context) => {
+        const sections = context.document.sections
+        sections.load('items')
+        await context.sync()
+        sections.items[0].pageSetup.textColumns.setCount(colCount)
+        if (colCount > 1) {
+          sections.items[0].pageSetup.textColumns.setIsEvenlySpaced(false)
         }
-      } else {
-        // w:cols なし → </w:sectPr> 直前に挿入
-        newSectPrXml = sectPrXml.replace(SECT_CLOSE, colsTag + SECT_CLOSE)
+        await context.sync()
+      })
+      // 第2ラン: 列間隔設定（段数＞1のみ）
+      if (colCount > 1) {
+        await Word.run(async (context) => {
+          const sections = context.document.sections
+          sections.load('items')
+          await context.sync()
+          const textColumns = sections.items[0].pageSetup.textColumns
+          textColumns.load('items')
+          await context.sync()
+          const spacePt = mm2pt(colSpacing)
+          for (let i = 0; i < textColumns.items.length - 1; i++) {
+            textColumns.items[i].spaceAfter = spacePt
+          }
+          await context.sync()
+        })
       }
-
-      xml = xml.slice(0, lastOpen) + newSectPrXml + xml.slice(lastClose + SECT_CLOSE.length)
-      body.insertOoxml(xml, 'Replace')
-      await context.sync()
     })
 
   // ── ページ余白設定 ───────────────────────────────────────────────────────
@@ -251,7 +223,7 @@ export function BasicSettingsTab() {
     <div className={styles.root}>
 
       <div className={styles.section}>
-        <SectionHeader title="ページ設定" />
+        <SectionHeader title="ページ設定確認" />
         <Button appearance="secondary" className={styles.btnFull} onClick={getDocSettings}>
           現在のドキュメントの設定値
         </Button>
@@ -276,17 +248,6 @@ export function BasicSettingsTab() {
             設定
           </Button>
         </div>
-        <RadioGroup
-          layout="horizontal"
-          value={textDir}
-          onChange={(_, d) => applyTextDirection(d.value as 'horizontal' | 'vertical')}
-        >
-          <Radio value="horizontal" label="横組み" />
-          <Radio value="vertical" label="縦組み" />
-        </RadioGroup>
-        <Text size={100} className={styles.hint}>
-          組方向は選択中の段落に適用されます。セクション全体への縦組みはAPI制限のため完全には適用できません。
-        </Text>
       </div>
 
       <div className={styles.section}>

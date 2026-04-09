@@ -130,7 +130,7 @@ const ALL_FEATURES: FeatureItem[] = [
   },
   {
     id: 'font-replace',
-    label: 'フォント一覧',
+    label: 'フォント取得・置換',
     tabId: 'typography',
     icon: <ArrowSortRegular fontSize={24} />,
     tooltip: 'ドキュメント使用フォントの一覧取得・一括置換',

@@ -4,6 +4,7 @@
 # ============================================================
 
 $ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $manifest_url = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/manifest.xml"
 $addinFolder  = "C:\OfficeAddins"
 $shareName    = "OfficeAddins"

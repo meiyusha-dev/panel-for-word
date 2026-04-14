@@ -22,7 +22,6 @@ import {
   TextIndentIncreaseRegular,
   ArrowSortRegular,
   ImageRegular,
-  TextboxRegular,
   MathFormatProfessionalRegular,
   AutosumRegular,
   BracesRegular,
@@ -157,11 +156,18 @@ const ALL_FEATURES: FeatureItem[] = [
     tooltip: '画像ファイルをカーソル位置に挿入します',
   },
   {
-    id: 'content-control',
-    label: 'テキスト枠',
+    id: 'shape-insert',
+    label: '図形',
     tabId: 'border',
-    icon: <TextboxRegular fontSize={24} />,
-    tooltip: 'ContentControl でテキスト枠を作成します',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="7" y1="9" x2="15" y2="9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+        <line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: 'テキスト枠・長方形をカーソル位置に挿入します\nサイズ・塗り・折り返しを設定できます',
   },
 
   // ── 数式 ─────────────────────────────────────────────────────────────
@@ -292,6 +298,149 @@ const ALL_FEATURES: FeatureItem[] = [
     icon: <EmojiRegular fontSize={24} />,
     tooltip: '丸数字・括弧数字などの記号を順番に挿入します',
   },
+
+  // ── 詳細設定（開発中） ───────────────────────────────────────────────
+  {
+    id: 'style-management',
+    label: 'スタイル管理',
+    tabId: 'basic',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="4" width="18" height="3" rx="1.5" fill="currentColor" opacity="0.9"/>
+        <rect x="3" y="10" width="14" height="2.5" rx="1.25" fill="currentColor" opacity="0.65"/>
+        <rect x="3" y="16" width="10" height="2.5" rx="1.25" fill="currentColor" opacity="0.4"/>
+        <circle cx="20" cy="17" r="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <line x1="22.1" y1="19.1" x2="23.5" y2="20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: '文書の書式崩れを可視化し\n直接上書き書式を選択的に除去します',
+  },
+  {
+    id: 'toc-update',
+    label: '目次・フィールド更新',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="3" y1="6" x2="8" y2="6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="3" y1="10" x2="14" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="3" y1="14" x2="11" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="3" y1="18" x2="13" y2="18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M19 9 L22 12 L19 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <path d="M16 12 L22 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: '目次および文書内のフィールドを\n最新の状態に一括更新します',
+  },
+  {
+    id: 'tracked-changes',
+    label: '変更履歴管理',
+    tabId: 'basic',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="3" y1="7" x2="16" y2="7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="3" y1="12" x2="14" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="3" y1="17" x2="11" y2="17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="19" cy="7" r="3.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <polyline points="17.2,7 18.5,8.3 21,5.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    tooltip: '文書内の変更履歴を確認し\n一括承認または一括却下します',
+  },
+  {
+    id: 'comments-manage',
+    label: 'コメント管理',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4 H20 V16 H13 L9 20 V16 H4 Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" fill="none"/>
+        <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="8" y1="12.5" x2="13" y2="12.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: 'コメントの件数確認・一括解決\n一括削除を行います',
+  },
+  {
+    id: 'header-footer',
+    label: 'ヘッダー・フッター',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <rect x="3" y="17" width="18" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <line x1="6" y1="11" x2="18" y2="11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
+        <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
+      </svg>
+    ),
+    tooltip: 'ヘッダー・フッターのテキストを設定します\n通常・先頭ページ・偶数ページごとに対応',
+  },
+  {
+    id: 'table-format',
+    label: '表の整形',
+    tabId: 'typography',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="18" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" strokeWidth="1.3"/>
+        <line x1="3" y1="15" x2="21" y2="15" stroke="currentColor" strokeWidth="1.3"/>
+        <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor" strokeWidth="1.3"/>
+        <line x1="15" y1="3" x2="15" y2="21" stroke="currentColor" strokeWidth="1.3"/>
+        <rect x="3" y="3" width="18" height="6" rx="1.5" fill="currentColor" opacity="0.15"/>
+      </svg>
+    ),
+    tooltip: '文書内の全ての表の列幅を均等にしたり\n先頭行をヘッダー行に設定します',
+  },
+  {
+    id: 'figure-caption',
+    label: '図表番号',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="4" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
+        <line x1="3" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
+        <text x="18" y="11" fontSize="7" fill="currentColor" fontFamily="monospace" fontWeight="bold">1</text>
+      </svg>
+    ),
+    tooltip: 'SEQ フィールド（図表番号）および\nREF フィールド（相互参照）を一括更新します',
+  },
+  {
+    id: 'page-break',
+    label: '改ページ制御',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="4" y1="10" x2="15" y2="10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="3 2"/>
+        <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="4" y1="21" x2="13" y2="21" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: '選択段落に改ページ設定を適用します\n意図しない改ページを防止します',
+  },
+  {
+    id: 'footnote',
+    label: '脚注管理',
+    tabId: 'basic',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="4" y1="10" x2="16" y2="10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="4" y1="14" x2="12" y2="14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <line x1="3" y1="19" x2="10" y2="19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="4" y1="22" x2="20" y2="22" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" opacity="0.5"/>
+        <text x="14" y="8" fontSize="6" fill="currentColor" fontFamily="monospace">*1</text>
+      </svg>
+    ),
+    tooltip: '文書内の脚注・文末脚注の\n件数確認と一覧表示を行います',
+  },
 ]
 
 interface FeatureGridProps {
@@ -405,6 +554,15 @@ const useStyles = makeStyles({
   },
   cardDragging: {
     opacity: '0.4',
+  },
+  cardDev: {
+    border: '1px solid #ff8c00',
+    backgroundColor: '#fff7f0',
+    ':hover': {
+      backgroundColor: '#ffe0b2',
+      transform: 'scale(1.05)',
+      boxShadow: '0 2px 8px rgba(200,80,0,0.18)',
+    },
   },
   tooltipText: {
     position: 'fixed',
@@ -532,6 +690,7 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onRe
             tabIndex={0}
             className={mergeClasses(
               styles.card,
+              feature.devCard && styles.cardDev,
               tabId === 'favorites' && dragOverId === feature.id && styles.cardDragOver,
               tabId === 'favorites' && draggingId === feature.id && styles.cardDragging,
             )}

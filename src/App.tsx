@@ -27,7 +27,7 @@ import { FontReplaceFeature } from './components/features/typography/FontReplace
 import { RubyFeature } from './components/features/typography/RubyFeature'
 // 枠の個別機能コンポーネント
 import { ImageInsertFeature } from './components/features/frame/ImageInsertFeature'
-import { ContentControlFeature } from './components/features/frame/ContentControlFeature'
+import { ShapeInsertFeature } from './components/features/frame/ContentControlFeature'
 // 数式の個別機能コンポーネント
 import { FractionFormulaFeature } from './components/features/formula/FractionFormulaFeature'
 import { ScriptFormulaFeature } from './components/features/formula/ScriptFormulaFeature'
@@ -42,6 +42,16 @@ import { MatrixFormulaFeature } from './components/features/formula/MatrixFormul
 // 定型文の個別機能コンポーネント
 import { TemplateTextFeature } from './components/features/template/TemplateTextFeature'
 import { SymbolSeriesFeature } from './components/features/template/SymbolSeriesFeature'
+// 詳細設定の個別機能コンポーネント
+import { StyleManagementFeature } from './components/features/basic/StyleManagementFeature'
+import { TocUpdateFeature } from './components/features/basic/TocUpdateFeature'
+import { TrackedChangesFeature } from './components/features/basic/TrackedChangesFeature'
+import { CommentsFeature } from './components/features/basic/CommentsFeature'
+import { HeaderFooterFeature } from './components/features/basic/HeaderFooterFeature'
+import { TableFormatFeature } from './components/features/basic/TableFormatFeature'
+import { FigureCaptionFeature } from './components/features/basic/FigureCaptionFeature'
+import { PageBreakFeature } from './components/features/basic/PageBreakFeature'
+import { FootnoteFeature } from './components/features/basic/FootnoteFeature'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'favorites',  label: '★' },
@@ -261,7 +271,7 @@ export default function App() {
       case 'auto-ruby':           return <RubyFeature />
       // 枠
       case 'image-insert':        return <ImageInsertFeature />
-      case 'content-control':     return <ContentControlFeature />
+      case 'shape-insert':         return <ShapeInsertFeature />
       // 数式
       case 'formula-fraction':    return <FractionFormulaFeature />
       case 'formula-script':      return <ScriptFormulaFeature />
@@ -276,6 +286,16 @@ export default function App() {
       // 定型文
       case 'template-text':       return <TemplateTextFeature />
       case 'template-symbol':     return <SymbolSeriesFeature />
+      // 詳細設定
+      case 'style-management':    return <StyleManagementFeature />
+      case 'toc-update':          return <TocUpdateFeature />
+      case 'tracked-changes':     return <TrackedChangesFeature />
+      case 'comments-manage':     return <CommentsFeature />
+      case 'header-footer':       return <HeaderFooterFeature />
+      case 'table-format':         return <TableFormatFeature />
+      case 'figure-caption':       return <FigureCaptionFeature />
+      case 'page-break':           return <PageBreakFeature />
+      case 'footnote':             return <FootnoteFeature />
       default:                    return null
     }
   }

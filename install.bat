@@ -10,5 +10,24 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+:: install.ps1 の存在確認
+if not exist "%~dp0install.ps1" (
+    echo.
+    echo [ERROR] install.ps1 が見つかりません。
+    echo         install.bat と install.ps1 を同じフォルダに置いてください。
+    echo.
+    pause
+    exit /b 1
+)
+
+:: ダウンロードブロックを解除してから実行
+powershell -ExecutionPolicy Bypass -Command "Unblock-File -Path '%~dp0install.ps1' -ErrorAction SilentlyContinue"
+
 :: PowerShell スクリプトを実行
 powershell -ExecutionPolicy Bypass -File "%~dp0install.ps1"
+
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] インストールに失敗しました。
+    pause
+)

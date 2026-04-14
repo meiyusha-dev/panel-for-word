@@ -13,6 +13,23 @@ const useStyles = makeStyles({
 })
 
 /**
+ * OOXML 内の <w:keepNext> を追加/削除する
+ * keepWithNext (w:keepNext) は Word JS API の Paragraph に直接プロパティがないため OOXML で操作する
+ */
+function patchKeepWithNext(ooxml: string, value: boolean): string {
+  let xml = ooxml
+    .replace(/<w:keepNext[^>]*\/>/g, '')
+    .replace(/<w:keepNext[^>]*>[\s\S]*?<\/w:keepNext>/g, '')
+
+  if (!value) return xml
+
+  if (/<w:pPr(?:\s[^>]*)?>/.test(xml)) {
+    return xml.replace(/(<w:pPr(?:\s[^>]*)?>)/, '$1<w:keepNext/>')
+  }
+  return xml.replace(/(<w:p(?:\s[^>]*)?>)(?!<w:pPr)/, '$1<w:pPr><w:keepNext/></w:pPr>')
+}
+
+/**
  * OOXML 内の <w:pageBreakBefore> を追加/削除する
  * pageBreakBefore は Word JS API に直接プロパティがないため OOXML で操作する
  */
@@ -49,18 +66,13 @@ export function PageBreakFeature() {
         return
       }
 
-      // keepWithNext は paragraphFormat 経由で設定
-      for (const para of paras.items) {
-        para.paragraphFormat.keepWithNext = keepWithNext
-      }
-      await context.sync()
-
-      // pageBreakBefore は OOXML 経由で設定
+      // keepWithNext・pageBreakBefore は OOXML 経由で設定
       const ooxmlResults = paras.items.map(p => p.getRange().getOoxml())
       await context.sync()
 
       for (let i = 0; i < paras.items.length; i++) {
-        const patched = patchPageBreakBefore(ooxmlResults[i].value, pageBreakBefore)
+        let patched = patchKeepWithNext(ooxmlResults[i].value, keepWithNext)
+        patched = patchPageBreakBefore(patched, pageBreakBefore)
         paras.items[i].getRange().insertOoxml(patched, 'Replace')
       }
       await context.sync()
@@ -74,19 +86,15 @@ export function PageBreakFeature() {
       paras.load('items')
       await context.sync()
 
-      for (const para of paras.items) {
-        para.paragraphFormat.keepWithNext = false
-      }
-      await context.sync()
-
-      // pageBreakBefore を OOXML から削除（該当する段落のみ処理）
+      // keepWithNext・pageBreakBefore を OOXML から削除（該当する段落のみ処理）
       const ooxmlResults = paras.items.map(p => p.getRange().getOoxml())
       await context.sync()
 
       for (let i = 0; i < paras.items.length; i++) {
         const original = ooxmlResults[i].value
-        if (original.includes('<w:pageBreakBefore')) {
-          const patched = patchPageBreakBefore(original, false)
+        if (original.includes('<w:keepNext') || original.includes('<w:pageBreakBefore')) {
+          let patched = patchKeepWithNext(original, false)
+          patched = patchPageBreakBefore(patched, false)
           paras.items[i].getRange().insertOoxml(patched, 'Replace')
         }
       }

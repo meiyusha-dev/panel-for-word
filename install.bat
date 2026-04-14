@@ -1,5 +1,5 @@
 @echo off
-:: Word Panel アドイン インストーラー
+:: Word Panel アドイン インストーラー（単体版）
 :: このファイルをダブルクリックして管理者として実行してください
 
 :: 管理者権限チェック・昇格
@@ -10,5 +10,18 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: PowerShell スクリプトを実行
-powershell -ExecutionPolicy Bypass -File "%~dp0install.ps1"
+:: PowerShell スクリプトを一時ファイルにダウンロードして実行
+set "PS1=%TEMP%\word-panel-install-%RANDOM%.ps1"
+echo スクリプトを取得しています...
+powershell -ExecutionPolicy Bypass -Command ^
+  "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/otayoshino/panel-for-word/master/install.ps1' -OutFile '%PS1%' -UseBasicParsing"
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] スクリプトのダウンロードに失敗しました。
+    echo         インターネット接続を確認してください。
+    pause
+    exit /b 1
+)
+
+powershell -ExecutionPolicy Bypass -File "%PS1%"
+del "%PS1%" >nul 2>&1

@@ -319,7 +319,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'toc-update',
     label: '目次・フィールド更新',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="3" y1="6" x2="8" y2="6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
@@ -351,7 +350,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'comments-manage',
     label: 'コメント管理',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M4 4 H20 V16 H13 L9 20 V16 H4 Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" fill="none"/>
@@ -365,7 +363,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'header-footer',
     label: 'ヘッダー・フッター',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="18" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -380,7 +377,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'table-format',
     label: '表の整形',
     tabId: 'typography',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="18" height="18" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -397,7 +393,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'figure-caption',
     label: '図表番号',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="4" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -412,7 +407,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'page-break',
     label: '改ページ制御',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
@@ -428,7 +422,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'footnote',
     label: '脚注管理',
     tabId: 'basic',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>

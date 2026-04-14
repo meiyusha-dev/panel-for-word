@@ -5,13 +5,13 @@
 
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$manifest_url = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/manifest.xml"
-$dictServer_url = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/dict-server.ps1"
-$dictBase_url = "https://otayoshino.github.io/panel-for-word/dict"
-$addinFolder  = "C:\OfficeAddins"
-$dictFolder   = "$addinFolder\dict"
-$shareName    = "OfficeAddins"
-$taskName     = "WordPanel-DictServer"
+$manifest_url    = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/manifest.xml"
+$dictServer_url  = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/dict-server.ps1"
+$dictBase_url    = "https://otayoshino.github.io/panel-for-word/dict"
+$addinFolder     = "C:\OfficeAddins"
+$dictFolder      = "$addinFolder\dict"
+$shareName       = "OfficeAddins"
+$taskName        = "WordPanel-DictServer"
 
 $dictFiles = @(
     'base.dat.gz', 'cc.dat.gz', 'check.dat.gz',
@@ -22,12 +22,15 @@ $dictFiles = @(
 
 function Write-Step($msg) { Write-Host "`n>>> $msg" -ForegroundColor Cyan }
 function Write-OK($msg)   { Write-Host "    OK: $msg" -ForegroundColor Green }
+function Write-Warn($msg) { Write-Host "    WARN: $msg" -ForegroundColor Yellow }
 function Write-Fail($msg) { Write-Host "    ERROR: $msg" -ForegroundColor Red }
 
 Write-Host "======================================" -ForegroundColor Yellow
 Write-Host "  Word Panel アドイン インストーラー  " -ForegroundColor Yellow
 Write-Host "======================================" -ForegroundColor Yellow
 
+# ── 必須ステップ（失敗したら中断） ──────────────────────────
+$coreOk = $false
 try {
     # 1. フォルダ作成
     Write-Step "フォルダを作成しています..."
@@ -40,23 +43,7 @@ try {
     Invoke-WebRequest -Uri $manifest_url -OutFile "$addinFolder\manifest.xml" -UseBasicParsing
     Write-OK "manifest.xml を保存しました"
 
-    # 3. 辞書ファイルをダウンロード（12ファイル、計約17MB）
-    Write-Step "辞書ファイルをダウンロードしています（約17MB）..."
-    $i = 1
-    foreach ($f in $dictFiles) {
-        Write-Host "    ($i/$($dictFiles.Count)) $f ..." -NoNewline
-        Invoke-WebRequest -Uri "$dictBase_url/$f" -OutFile "$dictFolder\$f" -UseBasicParsing
-        Write-Host " OK" -ForegroundColor Green
-        $i++
-    }
-    Write-OK "辞書ファイルを $dictFolder に保存しました"
-
-    # 4. dict-server.ps1 をダウンロード
-    Write-Step "辞書サーバースクリプトを配置しています..."
-    Invoke-WebRequest -Uri $dictServer_url -OutFile "$addinFolder\dict-server.ps1" -UseBasicParsing
-    Write-OK "dict-server.ps1 を保存しました"
-
-    # 5. フォルダを共有
+    # 3. フォルダを共有
     Write-Step "フォルダを共有しています..."
     if (Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue) {
         Remove-SmbShare -Name $shareName -Force | Out-Null
@@ -65,12 +52,12 @@ try {
     $uncPath = "\\$env:COMPUTERNAME\$shareName"
     Write-OK "共有パス: $uncPath"
 
-    # 6. Office 2019 向け WebView2 対応レジストリ
+    # 4. Office 2019 向け WebView2 対応レジストリ
     Write-Step "WebView2 対応レジストリを設定しています..."
     reg add "HKCU\SOFTWARE\Microsoft\Office\16.0\WEF" /v "Win32WebView2" /t REG_DWORD /d 1 /f | Out-Null
     Write-OK "WebView2 レジストリを設定しました"
 
-    # 7. Word の信頼できるカタログに登録
+    # 5. Word の信頼できるカタログに登録
     Write-Step "Word のアドインカタログを登録しています..."
     $catalogBase = "HKCU:\Software\Microsoft\Office\16.0\WEF\TrustedCatalogs"
     $existing = Get-ChildItem -Path $catalogBase -ErrorAction SilentlyContinue |
@@ -78,7 +65,7 @@ try {
     if ($existing) {
         Write-OK "カタログは既に登録済みです"
     } else {
-        $guid = [System.Guid]::NewGuid().ToString("B").ToUpper()
+        $guid    = [System.Guid]::NewGuid().ToString("B").ToUpper()
         $regPath = "$catalogBase\$guid"
         New-Item -Path $regPath -Force | Out-Null
         Set-ItemProperty -Path $regPath -Name "Id"    -Value $guid
@@ -87,29 +74,56 @@ try {
         Write-OK "カタログを登録しました: $uncPath"
     }
 
-    # 8. 辞書サーバーをログオン時自動起動タスクに登録
-    Write-Step "辞書サーバーをスタートアップタスクに登録しています..."
-    $action   = New-ScheduledTaskAction -Execute 'powershell.exe' `
-                    -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$addinFolder\dict-server.ps1`""
-    $trigger  = New-ScheduledTaskTrigger -AtLogOn
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
-    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger `
-        -Settings $settings -RunLevel Highest -Force | Out-Null
-    Write-OK "スケジュールタスク '$taskName' を登録しました"
+    $coreOk = $true
+} catch {
+    Write-Fail "必須ステップでエラーが発生しました："
+    Write-Fail $_.Exception.Message
+}
 
-    # 9. 辞書サーバーを今すぐ起動
-    Write-Step "辞書サーバーを起動しています..."
-    Start-ScheduledTask -TaskName $taskName
-    Start-Sleep -Seconds 2
-    $port = Get-NetTCPConnection -LocalPort 8642 -State Listen -ErrorAction SilentlyContinue
-    if ($port) {
-        Write-OK "辞書サーバーが localhost:8642 で起動しました"
-    } else {
-        Write-Host "    INFO: サーバーは次回ログオン時に自動起動します" -ForegroundColor Yellow
+# ── オプションステップ（失敗しても続行） ─────────────────────
+if ($coreOk) {
+    # 6. 辞書ファイルをダウンロード（約17MB）
+    Write-Step "辞書ファイルをダウンロードしています（約17MB）..."
+    $dictOk = $true
+    try {
+        $i = 1
+        foreach ($f in $dictFiles) {
+            Write-Host "    ($i/$($dictFiles.Count)) $f ..." -NoNewline
+            Invoke-WebRequest -Uri "$dictBase_url/$f" -OutFile "$dictFolder\$f" -UseBasicParsing
+            Write-Host " OK" -ForegroundColor Green
+            $i++
+        }
+        Write-OK "辞書ファイルを $dictFolder に保存しました"
+    } catch {
+        $dictOk = $false
+        Write-Warn "辞書ダウンロードをスキップしました（ネットワーク制限の可能性）"
+        Write-Warn $_.Exception.Message
     }
 
-    # 完了
-    Write-Host "`n======================================" -ForegroundColor Yellow
+    # 7. dict-server.ps1 を配置してスタートアップタスクに登録
+    if ($dictOk) {
+        Write-Step "辞書サーバーを設定しています..."
+        try {
+            Invoke-WebRequest -Uri $dictServer_url -OutFile "$addinFolder\dict-server.ps1" -UseBasicParsing
+            $action   = New-ScheduledTaskAction -Execute 'powershell.exe' `
+                            -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$addinFolder\dict-server.ps1`""
+            $trigger  = New-ScheduledTaskTrigger -AtLogOn
+            $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
+            Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger `
+                -Settings $settings -RunLevel Highest -Force | Out-Null
+            Start-ScheduledTask -TaskName $taskName
+            Write-OK "辞書サーバータスク '$taskName' を登録・起動しました"
+        } catch {
+            Write-Warn "辞書サーバーの設定をスキップしました"
+            Write-Warn $_.Exception.Message
+        }
+    }
+}
+
+# ── 完了メッセージ ───────────────────────────────────────────
+Write-Host ""
+if ($coreOk) {
+    Write-Host "======================================" -ForegroundColor Yellow
     Write-Host "  インストール完了！                  " -ForegroundColor Yellow
     Write-Host "======================================" -ForegroundColor Yellow
     Write-Host ""
@@ -121,13 +135,13 @@ try {
     Write-Host "       「ファイル」→「オプション」→「リボンのユーザー設定」→「開発」にチェック" -ForegroundColor White
     Write-Host "  3. 「共有フォルダ」タブ → 「Word Panel」→ 「追加」" -ForegroundColor White
     Write-Host ""
-
-} catch {
+} else {
+    Write-Host "======================================" -ForegroundColor Red
+    Write-Host "  インストールに失敗しました          " -ForegroundColor Red
+    Write-Host "======================================" -ForegroundColor Red
     Write-Host ""
-    Write-Fail "インストール中にエラーが発生しました："
-    Write-Fail $_.Exception.Message
-    Write-Host ""
-    exit 1
-} finally {
-    pause
 }
+
+# pause は必ずここで実行（exit を使わないことで確実に到達する）
+pause
+if (-not $coreOk) { exit 1 }

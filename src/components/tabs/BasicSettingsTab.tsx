@@ -12,6 +12,16 @@ import {
 import { SectionHeader } from '../shared/SectionHeader'
 import { StatusBar } from '../shared/StatusBar'
 import { useWordRun } from '../../hooks/useWordRun'
+// --- basic features ---
+import { CommentsFeature } from '../features/basic/CommentsFeature'
+import { FigureCaptionFeature } from '../features/basic/FigureCaptionFeature'
+import { FootnoteFeature } from '../features/basic/FootnoteFeature'
+import { HeaderFooterFeature } from '../features/basic/HeaderFooterFeature'
+import { PageBreakFeature } from '../features/basic/PageBreakFeature'
+import { StyleManagementFeature } from '../features/basic/StyleManagementFeature'
+import { TableFormatFeature } from '../features/basic/TableFormatFeature'
+import { TocUpdateFeature } from '../features/basic/TocUpdateFeature'
+import { TrackedChangesFeature } from '../features/basic/TrackedChangesFeature'
 
 // 用紙サイズ定義（単位: pt, 1mm = 2.8346pt / JIS B系採用）
 const PAPER_SIZES: Record<string, { width: number; height: number }> = {
@@ -332,6 +342,44 @@ export function BasicSettingsTab() {
         <Button appearance="primary" className={styles.btnFull} onClick={applyColumns}>
           実行
         </Button>
+      </div>
+
+      {/* --- 基本機能カード --- */}
+      <div className={styles.section}>
+        <SectionHeader title="コメント管理" />
+        <CommentsFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="図表番号・相互参照" />
+        <FigureCaptionFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="脚注・文末脚注" />
+        <FootnoteFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="ヘッダー・フッター設定" />
+        <HeaderFooterFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="改ページ制御" />
+        <PageBreakFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="スタイル管理" />
+        <StyleManagementFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="表の整形" />
+        <TableFormatFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="目次・フィールド更新" />
+        <TocUpdateFeature />
+      </div>
+      <div className={styles.section}>
+        <SectionHeader title="変更履歴管理" />
+        <TrackedChangesFeature />
       </div>
 
       <StatusBar status={status} />

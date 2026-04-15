@@ -13,39 +13,39 @@ const useStyles = makeStyles({
 })
 
 // ── ユーティリティ：table の列幅均等化 ──────────────────────────────
+// 先頭行のセル幅のみを基準に均等化する。
+// 結合セルや AutoFit 有効の表で全行設定すると GeneralException が出るため
+// 先頭行のみ対象とする（Word は先頭行の列幅で以降の行を追従させる）。
 async function applyEqualWidth(context: Word.RequestContext, tables: Word.Table[]) {
+  // 先頭行を取得するため rows を load
   for (const table of tables) {
     table.rows.load('items')
   }
   await context.sync()
 
-  for (const table of tables) {
-    for (const row of table.rows.items) {
-      row.cells.load('items')
+  // 先頭行のセルを load
+  const firstRows = tables.map(t => t.rows.items[0]).filter(Boolean)
+  for (const row of firstRows) {
+    row.cells.load('items')
+  }
+  await context.sync()
+
+  // 各セルの columnWidth を取得
+  for (const row of firstRows) {
+    for (const cell of row.cells.items) {
+      cell.load('columnWidth')
     }
   }
   await context.sync()
 
-  for (const table of tables) {
-    for (const row of table.rows.items) {
-      for (const cell of row.cells.items) {
-        cell.load('columnWidth')
-      }
-    }
-  }
-  await context.sync()
-
-  for (const table of tables) {
-    const firstRow = table.rows.items[0]
-    if (!firstRow) continue
-    const colCount = firstRow.cells.items.length
-    if (colCount === 0) continue
-    const totalWidth = firstRow.cells.items.reduce((sum, cell) => sum + cell.columnWidth, 0)
-    const colWidth = totalWidth / colCount
-    for (const row of table.rows.items) {
-      for (const cell of row.cells.items) {
-        cell.columnWidth = colWidth
-      }
+  // 均等幅を計算して先頭行のセルに設定
+  for (const row of firstRows) {
+    const cells = row.cells.items
+    if (cells.length === 0) continue
+    const totalWidth = cells.reduce((sum, cell) => sum + cell.columnWidth, 0)
+    const colWidth = totalWidth / cells.length
+    for (const cell of cells) {
+      cell.columnWidth = colWidth
     }
   }
   await context.sync()

@@ -405,6 +405,7 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'table-format',
     label: '表の整形',
     tabId: 'typography',
+    hidden: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="18" height="18" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -692,8 +693,8 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onRe
   // 現在のタブに対応する機能カードを抽出
   // お気に入りタブは favorites 配列の順序を維持
   const features = tabId === 'favorites'
-    ? favorites.map((id) => ALL_FEATURES.find((f) => f.id === id)).filter((f): f is FeatureItem => f !== undefined)
-    : ALL_FEATURES.filter((f) => f.tabId === tabId)
+    ? favorites.map((id) => ALL_FEATURES.find((f) => f.id === id)).filter((f): f is FeatureItem => f !== undefined && !f.hidden)
+    : ALL_FEATURES.filter((f) => f.tabId === tabId && !f.hidden)
 
   return (
     <>

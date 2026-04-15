@@ -14,4 +14,5 @@ export type FeatureItem = {
   tooltip: string   // ホバー時に表示する説明文
   tabId: TabId      // 所属タブID
   devCard?: boolean // 開発中カード（オレンジ表示）
+  hidden?: boolean  // true のときカード非表示（機能・コードは保持）
 }

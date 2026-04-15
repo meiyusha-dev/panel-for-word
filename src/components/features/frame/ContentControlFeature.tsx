@@ -6,7 +6,6 @@ import {
   Button,
   Input,
   Label,
-  Text,
   makeStyles,
   tokens,
 } from '@fluentui/react-components'
@@ -20,26 +19,6 @@ import { useWordRun } from '../../../hooks/useWordRun'
 
 type SizeMode  = 'char' | 'mm'
 type ShapeType = 'textbox' | 'rect'
-type WrapType  = 'square' | 'tight' | 'topAndBottom' | 'inFront' | 'behind' | 'inline'
-
-const FILL_PRESETS: { color: string; label: string; bg: string; border: string }[] = [
-  { color: '',       label: 'なし', bg: '#ffffff', border: '#c5dcf5' },
-  { color: 'FFFFFF', label: '白',   bg: '#FFFFFF', border: '#c5dcf5' },
-  { color: 'FEF08A', label: '黄',   bg: '#FEF08A', border: 'transparent' },
-  { color: 'BBF7D0', label: '緑',   bg: '#BBF7D0', border: 'transparent' },
-  { color: 'BFDBFE', label: '青',   bg: '#BFDBFE', border: 'transparent' },
-  { color: 'FECACA', label: '赤',   bg: '#FECACA', border: 'transparent' },
-  { color: 'E9D5FF', label: '紫',   bg: '#E9D5FF', border: 'transparent' },
-]
-
-const WRAP_OPTIONS: { id: WrapType; label: string }[] = [
-  { id: 'square',       label: '四角形' },
-  { id: 'tight',        label: '狭く' },
-  { id: 'topAndBottom', label: '上下' },
-  { id: 'inFront',      label: '前面' },
-  { id: 'behind',       label: '背面' },
-  { id: 'inline',       label: '行内' },
-]
 
 // ────────────────────────────────────────────────────────────────────────────
 // EMU 変換
@@ -74,20 +53,14 @@ function buildShapeOoxml(
   cx: number,
   cy: number,
   shapeType: ShapeType,
-  fill: string,
-  wrap: WrapType,
 ): string {
+  const wrap: string = 'square'
   const docPrId  = generateDocPrId()
   const shapeName = `Shape ${docPrId}`
 
-  const fillXml = fill
-    ? `<a:solidFill><a:srgbClr val="${fill}"/></a:solidFill>`
-    : `<a:noFill/>`
-
-  // wps:cNvSpPr には txBx 属性は存在しない（スキーマ要件を正しく満たす）
   const cNvSpPr = shapeType === 'textbox'
-    ? `<wps:cNvSpPr><a:spLocks noChangeArrowheads="1"/></wps:cNvSpPr>`
-    : `<wps:cNvSpPr/>`
+    ? `<wps:cNvSpPr txBox="1"><a:spLocks noChangeArrowheads="1"/></wps:cNvSpPr>`
+    : `<wps:cNvSpPr><a:spLocks noChangeArrowheads="1"/></wps:cNvSpPr>`
 
   const bodyPr = shapeType === 'textbox'
     ? `<wps:bodyPr wrap="square" lIns="91440" rIns="91440" tIns="45720" bIns="45720"/>`
@@ -101,7 +74,7 @@ function buildShapeOoxml(
     `<wps:spPr>` +
     `<a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>` +
     `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>` +
-    fillXml +
+    `<a:noFill/>` +
     `<a:ln w="12700"><a:solidFill><a:srgbClr val="000000"/></a:solidFill></a:ln>` +
     `</wps:spPr>`
 
@@ -130,7 +103,7 @@ function buildShapeOoxml(
       `</wp:inline>`
   } else {
     const behindDoc = wrap === 'behind' ? '1' : '0'
-    const wrapXml: Partial<Record<WrapType, string>> = {
+    const wrapXml: Record<string, string> = {
       square:       `<wp:wrapSquare wrapText="bothSides"/>`,
       tight:        `<wp:wrapTight wrapText="bothSides"><wp:wrapPolygon edited="0">` +
                     `<wp:start x="0" y="0"/><wp:lineTo x="0" y="21600"/>` +
@@ -154,20 +127,30 @@ function buildShapeOoxml(
       `</wp:anchor>`
   }
 
-  // フルドキュメントラッパー形式（必要最小限の名前空間のみ）
-  const docNs = [
-    `xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"`,
-    `xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"`,
-    `xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"`,
-    `xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"`,
-  ].join(' ')
-
-  return (
-    `<w:document ${docNs}>` +
+  // pkg:package ラッパー形式（_ooxmlMath.ts と同パターン）
+  // insertOoxml() が内部で tmp ファイルを生成するのを回避するために
+  // w:document 直接ラップではなく pkg:package を使用する
+  return `<pkg:package xmlns:pkg="http://schemas.microsoft.com/office/2006/xmlPackage">` +
+    `<pkg:part pkg:name="/_rels/.rels" pkg:contentType="application/vnd.openxmlformats-package.relationships+xml">` +
+    `<pkg:xmlData>` +
+    `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+    `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>` +
+    `</Relationships>` +
+    `</pkg:xmlData>` +
+    `</pkg:part>` +
+    `<pkg:part pkg:name="/word/document.xml" pkg:contentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml">` +
+    `<pkg:xmlData>` +
+    `<w:document` +
+    ` xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"` +
+    ` xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"` +
+    ` xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"` +
+    ` xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">` +
     `<w:body>` +
     `<w:p><w:r><w:drawing>${drawing}</w:drawing></w:r></w:p>` +
-    `</w:body></w:document>`
-  )
+    `</w:body></w:document>` +
+    `</pkg:xmlData>` +
+    `</pkg:part>` +
+    `</pkg:package>`
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -267,51 +250,6 @@ const useStyles = makeStyles({
     fontWeight: '600',
     appearance: 'none' as const,
   },
-  sectionBox: {
-    backgroundColor: '#f5f9ff',
-    border: '1px solid #c5dcf5',
-    borderRadius: tokens.borderRadiusMedium,
-    padding: '8px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  fillRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    flexWrap: 'wrap',
-  },
-  wrapGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr',
-    gap: '4px',
-  },
-  wrapBtn: {
-    border: '1.5px solid #c5dcf5',
-    borderRadius: '4px',
-    backgroundColor: '#f5f9ff',
-    cursor: 'pointer',
-    padding: '5px 2px',
-    textAlign: 'center' as const,
-    fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
-    fontSize: '10.5px',
-    color: '#4a7cb5',
-    appearance: 'none' as const,
-  },
-  wrapBtnActive: {
-    border: '1.5px solid #1e4d8c',
-    borderRadius: '4px',
-    backgroundColor: '#dce8f7',
-    cursor: 'pointer',
-    padding: '5px 2px',
-    textAlign: 'center' as const,
-    fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
-    fontSize: '10.5px',
-    color: '#0c3370',
-    fontWeight: '600',
-    appearance: 'none' as const,
-  },
   btnFull: {
     width: '100%',
     fontSize: '11px',
@@ -324,22 +262,34 @@ const useStyles = makeStyles({
 
 export function ShapeInsertFeature() {
   const styles = useStyles()
-  const { runWord, status } = useWordRun()
+  const { runRaw, status, setStatus } = useWordRun()
 
   const [sizeMode,  setSizeMode]  = useState<SizeMode>('char')
   const [width,     setWidth]     = useState(20)
   const [height,    setHeight]    = useState(5)
   const [shapeType, setShapeType] = useState<ShapeType>('textbox')
-  const [fillColor, setFillColor] = useState('')
-  const [wrapType,  setWrapType]  = useState<WrapType>('square')
 
   const handleInsert = () =>
-    runWord(async (context) => {
+    runRaw(async () => {
       const { cx, cy } = calcEmu(sizeMode, width, height)
-      const ooxml = buildShapeOoxml(cx, cy, shapeType, fillColor, wrapType)
-      const sel = context.document.getSelection()
-      sel.insertOoxml(ooxml, Word.InsertLocation.replace)
-      await context.sync()
+      const ooxml = buildShapeOoxml(cx, cy, shapeType)
+
+      try {
+        // 通常モード: カーソル選択範囲に挿入
+        await Word.run(async (context) => {
+          const sel = context.document.getSelection()
+          sel.insertOoxml(ooxml, Word.InsertLocation.replace)
+          await context.sync()
+        })
+      } catch {
+        // 原始人モード: GeneralException → ドキュメント末尾に挿入
+        await Word.run(async (context) => {
+          context.document.body.insertOoxml(ooxml, Word.InsertLocation.end)
+          await context.sync()
+        })
+      }
+
+      setStatus({ type: 'success', message: '図形を挿入しました' })
     })
 
   return (
@@ -405,54 +355,6 @@ export function ShapeInsertFeature() {
           </svg>
           長方形
         </button>
-      </div>
-
-      <SectionHeader title="塗りつぶし" />
-      <div className={styles.sectionBox}>
-        <div className={styles.fillRow}>
-          {FILL_PRESETS.map(p => (
-            <button
-              key={p.color === '' ? '__none__' : p.color}
-              title={p.label}
-              onClick={() => setFillColor(p.color)}
-              style={{
-                width: '22px',
-                height: '22px',
-                borderRadius: '50%',
-                backgroundColor: p.bg,
-                border: fillColor === p.color
-                  ? '2px solid #1e4d8c'
-                  : `2px solid ${p.border}`,
-                cursor: 'pointer',
-                flexShrink: 0,
-                padding: '0',
-                appearance: 'none',
-                boxShadow: fillColor === p.color ? '0 0 0 2px white, 0 0 0 3.5px #1e4d8c' : 'none',
-              }}
-            />
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
-            <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif" }}>カスタム</Text>
-            <input
-              type="color"
-              style={{ width: '24px', height: '24px', border: 'none', background: 'none', cursor: 'pointer', padding: '0' }}
-              onChange={e => setFillColor(e.target.value.replace('#', ''))}
-            />
-          </div>
-        </div>
-      </div>
-
-      <SectionHeader title="文字列の折り返し" />
-      <div className={styles.wrapGrid}>
-        {WRAP_OPTIONS.map(o => (
-          <button
-            key={o.id}
-            className={wrapType === o.id ? styles.wrapBtnActive : styles.wrapBtn}
-            onClick={() => setWrapType(o.id)}
-          >
-            {o.label}
-          </button>
-        ))}
       </div>
 
       <Button appearance="primary" className={styles.btnFull} onClick={handleInsert}>

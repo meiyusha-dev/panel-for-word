@@ -26,49 +26,11 @@ export function IndentFeature() {
       paragraphs.items.forEach((p) => p.load('font/size'))
       await context.sync()
 
-      const items = paragraphs.items.map((p) => {
-        const range = p.getRange('Whole')
-        const ooxmlResult = range.getOoxml()
-        return { para: p, range, ooxmlResult }
-      })
-      await context.sync()
-
-      items.forEach(({ para, range, ooxmlResult }) => {
-        const charPt = para.font.size || 10.5
-        const toTwip = (ch: number) => Math.round(ch * charPt * 20)
-        const toCh100 = (ch: number) => Math.round(ch * 100)
-
-        let indTag: string
-        if (indentFirstLine >= 0) {
-          indTag = [
-            `<w:ind`,
-            ` w:left="${toTwip(indentLeft)}" w:leftChars="${toCh100(indentLeft)}"`,
-            ` w:right="${toTwip(indentRight)}" w:rightChars="${toCh100(indentRight)}"`,
-            ` w:firstLine="${toTwip(indentFirstLine)}" w:firstLineChars="${toCh100(indentFirstLine)}"`,
-            `/>`,
-          ].join('')
-        } else {
-          const h = -indentFirstLine
-          indTag = [
-            `<w:ind`,
-            ` w:left="${toTwip(indentLeft)}" w:leftChars="${toCh100(indentLeft)}"`,
-            ` w:right="${toTwip(indentRight)}" w:rightChars="${toCh100(indentRight)}"`,
-            ` w:hanging="${toTwip(h)}" w:hangingChars="${toCh100(h)}"`,
-            `/>`,
-          ].join('')
-        }
-
-        let xml = ooxmlResult.value
-        if (/<w:ind[^>]*\/>/s.test(xml)) {
-          xml = xml.replace(/<w:ind[^>]*\/>/s, indTag)
-        } else if (/<\/w:pPr>/.test(xml)) {
-          xml = xml.replace('<\/w:pPr>', indTag + '<\/w:pPr>')
-        } else if (/<w:pPr\s*\/>/s.test(xml)) {
-          xml = xml.replace(/<w:pPr\s*\/>/s, `<w:pPr>${indTag}<\/w:pPr>`)
-        } else {
-          xml = xml.replace(/(<w:p(?:\s[^>]*)?>)/s, `$1<w:pPr>${indTag}<\/w:pPr>`)
-        }
-        range.insertOoxml(xml, 'Replace')
+      paragraphs.items.forEach((p) => {
+        const charPt = p.font.size || 10.5
+        p.leftIndent = indentLeft * charPt
+        p.rightIndent = indentRight * charPt
+        p.firstLineIndent = indentFirstLine * charPt
       })
       await context.sync()
     })
@@ -78,15 +40,10 @@ export function IndentFeature() {
       const paragraphs = context.document.getSelection().paragraphs
       paragraphs.load('items')
       await context.sync()
-      const items = paragraphs.items.map((p) => {
-        const range = p.getRange('Whole')
-        const ooxmlResult = range.getOoxml()
-        return { range, ooxmlResult }
-      })
-      await context.sync()
-      items.forEach(({ range, ooxmlResult }) => {
-        const xml = ooxmlResult.value.replace(/<w:ind[^>]*\/>/s, '')
-        range.insertOoxml(xml, 'Replace')
+      paragraphs.items.forEach((p) => {
+        p.leftIndent = 0
+        p.rightIndent = 0
+        p.firstLineIndent = 0
       })
       await context.sync()
       setIndentLeft(0)

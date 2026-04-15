@@ -159,7 +159,6 @@ const ALL_FEATURES: FeatureItem[] = [
     id: 'shape-insert',
     label: '図形',
     tabId: 'border',
-    devCard: true,
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="1.5"/>
@@ -168,6 +167,35 @@ const ALL_FEATURES: FeatureItem[] = [
       </svg>
     ),
     tooltip: 'テキスト枠・長方形をカーソル位置に挿入します\nサイズ・塗り・折り返しを設定できます',
+  },
+  {
+    id: 'z-order',
+    label: '重ね順',
+    tabId: 'border',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="13" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <rect x="9" y="3" width="13" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+        <line x1="18" y1="7" x2="18" y2="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="16" y1="5" x2="20" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: '選択した図形の重ね順を変更します\n最前面・前面・背面・最背面',
+  },
+  {
+    id: 'frame-align',
+    label: '枠揃え',
+    tabId: 'border',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="4" y1="3" x2="4" y2="21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <rect x="5" y="5" width="10" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/>
+        <rect x="5" y="13" width="14" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/>
+      </svg>
+    ),
+    tooltip: '選択した図形の水平位置を揃えます\n左揃え・中央揃え・右揃え',
   },
 
   // ── 数式 ─────────────────────────────────────────────────────────────

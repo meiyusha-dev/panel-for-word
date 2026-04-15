@@ -28,6 +28,8 @@ import { RubyFeature } from './components/features/typography/RubyFeature'
 // 枠の個別機能コンポーネント
 import { ImageInsertFeature } from './components/features/frame/ImageInsertFeature'
 import { ShapeInsertFeature } from './components/features/frame/ContentControlFeature'
+import { ZOrderFeature } from './components/features/frame/ZOrderFeature'
+import { FrameAlignFeature } from './components/features/frame/FrameAlignFeature'
 // 数式の個別機能コンポーネント
 import { FractionFormulaFeature } from './components/features/formula/FractionFormulaFeature'
 import { ScriptFormulaFeature } from './components/features/formula/ScriptFormulaFeature'
@@ -271,7 +273,9 @@ export default function App() {
       case 'auto-ruby':           return <RubyFeature />
       // 枠
       case 'image-insert':        return <ImageInsertFeature />
-      case 'shape-insert':         return <ShapeInsertFeature />
+      case 'shape-insert':        return <ShapeInsertFeature />
+      case 'z-order':             return <ZOrderFeature />
+      case 'frame-align':         return <FrameAlignFeature />
       // 数式
       case 'formula-fraction':    return <FractionFormulaFeature />
       case 'formula-script':      return <ScriptFormulaFeature />

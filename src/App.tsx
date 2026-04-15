@@ -224,6 +224,13 @@ const useStyles = makeStyles({
   },
 })
 
+const DEFAULT_FAVORITES = [
+  'page-settings', 'style-management', 'header-footer',
+  'toc-update', 'tracked-changes', 'page-break',
+  'indent', 'auto-ruby', 'table-insert',
+  'table-format', 'template-text', 'template-symbol',
+]
+
 export default function App() {
   const styles = useStyles()
   const [activeTab, setActiveTab] = useState<TabId>('favorites')
@@ -234,9 +241,9 @@ export default function App() {
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('panel-word-favorites')
-      return saved ? (JSON.parse(saved) as string[]) : []
+      return saved ? (JSON.parse(saved) as string[]) : DEFAULT_FAVORITES
     } catch {
-      return []
+      return DEFAULT_FAVORITES
     }
   })
 

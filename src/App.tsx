@@ -241,7 +241,7 @@ export default function App() {
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('panel-word-favorites')
-      return saved ? (JSON.parse(saved) as string[]) : DEFAULT_FAVORITES
+      return saved !== null ? (JSON.parse(saved) as string[]) : DEFAULT_FAVORITES
     } catch {
       return DEFAULT_FAVORITES
     }

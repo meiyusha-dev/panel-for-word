@@ -415,7 +415,7 @@ const ALL_FEATURES: FeatureItem[] = [
         <rect x="3" y="3" width="18" height="6" rx="1.5" fill="currentColor" opacity="0.15"/>
       </svg>
     ),
-    tooltip: '文書内の全ての表の列幅を均等にしたり\n先頭行をヘッダー行に設定します',
+    tooltip: '文書内の全ての表の列幅を均等にします',
   },
   {
     id: 'figure-caption',

@@ -14,13 +14,13 @@ const useStyles = makeStyles({
 export function LineSpacingFeature() {
   const styles = useStyles()
   const { runWord, status } = useWordRun()
-  const [lineSpacingMode, setLineSpacingMode] = useState<'multiple' | 'fixed'>('multiple')
+  const [lineSpacingMode, setLineSpacingMode] = useState<'multiple' | 'fixed'>('fixed')
   const [lineSpacingMultiple, setLineSpacingMultiple] = useState(1.0)
   const [lineSpacingFixed, setLineSpacingFixed] = useState(12)
 
-  const applyLineSpacing = () =>
+  const applyToTarget = (getTarget: (context: Word.RequestContext) => Word.ParagraphCollection) =>
     runWord(async (context) => {
-      const paragraphs = context.document.getSelection().paragraphs
+      const paragraphs = getTarget(context)
       paragraphs.load('items')
       await context.sync()
       paragraphs.items.forEach((p) => {
@@ -35,6 +35,12 @@ export function LineSpacingFeature() {
       })
       await context.sync()
     })
+
+  const applyLineSpacing = () =>
+    applyToTarget((context) => context.document.getSelection().paragraphs)
+
+  const applyLineSpacingToAll = () =>
+    applyToTarget((context) => context.document.body.paragraphs)
 
   return (
     <div className={styles.root}>
@@ -75,6 +81,9 @@ export function LineSpacingFeature() {
       </div>
       <Button appearance="primary" className={styles.btnFull} onClick={applyLineSpacing}>
         選択範囲に適用
+      </Button>
+      <Button appearance="secondary" className={styles.btnFull} onClick={applyLineSpacingToAll}>
+        ドキュメント全体に適用
       </Button>
       <StatusBar status={status} />
     </div>

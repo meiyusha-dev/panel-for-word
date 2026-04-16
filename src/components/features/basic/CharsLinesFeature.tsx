@@ -26,6 +26,15 @@ const useStyles = makeStyles({
   },
 })
 
+const CHARS_MIN = 1
+const CHARS_MAX = 45
+const LINES_MIN = 1
+const LINES_MAX = 49
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max)
+}
+
 export function CharsLinesFeature() {
   const styles = useStyles()
   const { runWord, status } = useWordRun()
@@ -54,6 +63,11 @@ export function CharsLinesFeature() {
       ps.charsLine = charsLine
       ps.linesPage = linesPage
       await context.sync()
+      // Word が実際に設定した値を読み戻す（範囲外は自動補正される）
+      ps.load(['charsLine', 'linesPage'])
+      await context.sync()
+      setCharsLine(ps.charsLine)
+      setLinesPage(ps.linesPage)
     })
 
   return (
@@ -62,19 +76,23 @@ export function CharsLinesFeature() {
         <Field label="文字数">
           <SpinButton
             value={charsLine}
-            min={1}
-            max={200}
+            min={CHARS_MIN}
+            max={CHARS_MAX}
             step={1}
-            onChange={(_, d) => setCharsLine(d.value ?? 40)}
+            onChange={(_, d) =>
+              setCharsLine(clamp(d.value ?? charsLine, CHARS_MIN, CHARS_MAX))
+            }
           />
         </Field>
         <Field label="行数">
           <SpinButton
             value={linesPage}
-            min={1}
-            max={200}
+            min={LINES_MIN}
+            max={LINES_MAX}
             step={1}
-            onChange={(_, d) => setLinesPage(d.value ?? 36)}
+            onChange={(_, d) =>
+              setLinesPage(clamp(d.value ?? linesPage, LINES_MIN, LINES_MAX))
+            }
           />
         </Field>
       </div>

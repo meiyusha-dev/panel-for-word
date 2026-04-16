@@ -30,6 +30,7 @@ import { ImageInsertFeature } from './components/features/frame/ImageInsertFeatu
 import { ShapeInsertFeature } from './components/features/frame/ContentControlFeature'
 import { ZOrderFeature } from './components/features/frame/ZOrderFeature'
 import { FrameAlignFeature } from './components/features/frame/FrameAlignFeature'
+import { TextboxPaddingFeature } from './components/features/frame/TextboxPaddingFeature'
 // 数式の個別機能コンポーネント
 import { FractionFormulaFeature } from './components/features/formula/FractionFormulaFeature'
 import { ScriptFormulaFeature } from './components/features/formula/ScriptFormulaFeature'
@@ -226,9 +227,10 @@ const useStyles = makeStyles({
 
 const DEFAULT_FAVORITES = [
   'page-settings', 'style-management', 'header-footer',
-  'toc-update', 'tracked-changes', 'page-break',
-  'indent', 'line-spacing', 'auto-ruby',
-  'table-insert', 'template-text', 'template-symbol',
+  'toc-update', 'tracked-changes', 'chars-lines',
+  'page-break', 'indent', 'line-spacing',
+  'auto-ruby', 'table-insert', 'template-text',
+  'template-symbol',
 ]
 
 export default function App() {
@@ -283,6 +285,7 @@ export default function App() {
       case 'shape-insert':        return <ShapeInsertFeature />
       case 'z-order':             return <ZOrderFeature />
       case 'frame-align':         return <FrameAlignFeature />
+      case 'textbox-padding':     return <TextboxPaddingFeature />
       // 数式
       case 'formula-fraction':    return <FractionFormulaFeature />
       case 'formula-script':      return <ScriptFormulaFeature />

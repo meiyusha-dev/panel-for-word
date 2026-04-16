@@ -56,11 +56,16 @@ export function ZOrderFeature() {
 
   const handleZOrder = (mode: ZMode) =>
     runWord(async (context) => {
-      const range = context.document.getSelection()
-      const ooxmlResult = range.getOoxml()
-      await context.sync()
-
-      const ooxml = ooxmlResult.value
+      let ooxml: string
+      try {
+        const range = context.document.getSelection()
+        const ooxmlResult = range.getOoxml()
+        await context.sync()
+        ooxml = ooxmlResult.value
+      } catch {
+        setStatus({ type: 'warning', message: '図形を選択し直して実行してください\n（枠線クリックではなく図形内部にカーソルを置いてください）' })
+        return
+      }
 
       // 浮動オブジェクト（wp:anchor）でなければ中断
       if (!ooxml.includes('wp:anchor')) {

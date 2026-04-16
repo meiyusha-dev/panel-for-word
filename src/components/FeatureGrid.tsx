@@ -197,6 +197,23 @@ const ALL_FEATURES: FeatureItem[] = [
     ),
     tooltip: '選択した図形の水平位置を揃えます\n左揃え・中央揃え・右揃え',
   },
+  {
+    id: 'textbox-padding',
+    label: 'テキスト内余白',
+    tabId: 'border',
+    devCard: true,
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <rect x="7" y="7" width="10" height="10" rx="1" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 1.5"/>
+        <line x1="12" y1="3" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="3" y1="12" x2="7" y2="12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="17" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      </svg>
+    ),
+    tooltip: 'テキスト枠の内側の余白（上・下・左・右）を設定します\nカードを開くと現在の値を自動読み込みします',
+  },
 
   // ── 数式 ─────────────────────────────────────────────────────────────
   {

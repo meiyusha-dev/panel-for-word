@@ -28,9 +28,6 @@ import { RubyFeature } from './components/features/typography/RubyFeature'
 // 枠の個別機能コンポーネント
 import { ImageInsertFeature } from './components/features/frame/ImageInsertFeature'
 import { ShapeInsertFeature } from './components/features/frame/ContentControlFeature'
-import { ZOrderFeature } from './components/features/frame/ZOrderFeature'
-import { FrameAlignFeature } from './components/features/frame/FrameAlignFeature'
-import { TextboxPaddingFeature } from './components/features/frame/TextboxPaddingFeature'
 // 数式の個別機能コンポーネント
 import { FractionFormulaFeature } from './components/features/formula/FractionFormulaFeature'
 import { ScriptFormulaFeature } from './components/features/formula/ScriptFormulaFeature'
@@ -39,6 +36,7 @@ import { IntegralFormulaFeature } from './components/features/formula/IntegralFo
 import { LargeOpFormulaFeature } from './components/features/formula/LargeOpFormulaFeature'
 import { BracketFormulaFeature } from './components/features/formula/BracketFormulaFeature'
 import { TrigFuncFormulaFeature } from './components/features/formula/TrigFuncFormulaFeature'
+import { FuncFormulaFeature } from './components/features/formula/FuncFormulaFeature'
 import { AccentFormulaFeature } from './components/features/formula/AccentFormulaFeature'
 import { OperatorFormulaFeature } from './components/features/formula/OperatorFormulaFeature'
 import { MatrixFormulaFeature } from './components/features/formula/MatrixFormulaFeature'
@@ -283,9 +281,6 @@ export default function App() {
       // 枠
       case 'image-insert':        return <ImageInsertFeature />
       case 'shape-insert':        return <ShapeInsertFeature />
-      case 'z-order':             return <ZOrderFeature />
-      case 'frame-align':         return <FrameAlignFeature />
-      case 'textbox-padding':     return <TextboxPaddingFeature />
       // 数式
       case 'formula-fraction':    return <FractionFormulaFeature />
       case 'formula-script':      return <ScriptFormulaFeature />
@@ -294,6 +289,7 @@ export default function App() {
       case 'formula-large-op':    return <LargeOpFormulaFeature />
       case 'formula-bracket':     return <BracketFormulaFeature />
       case 'formula-trig':        return <TrigFuncFormulaFeature />
+      case 'formula-func':        return <FuncFormulaFeature />
       case 'formula-accent':      return <AccentFormulaFeature />
       case 'formula-operator':    return <OperatorFormulaFeature />
       case 'formula-matrix':      return <MatrixFormulaFeature />

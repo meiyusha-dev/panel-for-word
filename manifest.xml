@@ -12,7 +12,7 @@
   <DisplayName DefaultValue="かんたんツールボックス for Word" />
   <Description DefaultValue="フォント・段落・数式・表など、Wordの書式設定をすばやく操作できるタスクパネル型アドインです。" />
   <IconUrl DefaultValue="https://otayoshino.github.io/panel-for-word/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://otayoshino.github.io/panel-for-word/assets/icon-80.png" />
+  <HighResolutionIconUrl DefaultValue="https://otayoshino.github.io/panel-for-word/assets/icon-64.png" />
   <SupportUrl DefaultValue="https://otayoshino.github.io/panel-for-word/support.html" />
 
   <AppDomains>

@@ -126,6 +126,20 @@
     .tab-panel { display: none; padding: 24px 0; }
     .tab-panel.active { display: block; }
     .tab-panel h3 { font-size: 15px; font-weight: 700; margin: 16px 0 8px; }
+
+    .feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 12px 0 20px;
+    }
+    .feature-row img {
+      flex-shrink: 0;
+      width: 160px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    .feature-row p { margin-bottom: 0; }
   </style>
 </head>
 <body>
@@ -200,33 +214,144 @@
 
     <div class="tab-panel active" id="tab-favorites">
       <h3>お気に入り</h3>
-      <p>よく使う機能カードを「お気に入り」タブに追加することで、毎回カテゴリを探す手間を省けます。カード右上の ★ アイコンをクリックして登録してください。</p>
-      <img src="images/favorites-demo.gif" alt="お気に入り機能の操作デモ" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:16px 0;" />
+      <p>よく使う機能カードを「お気に入り」タブに追加することで、機能を探す手間を省けます。カード右上の ★ アイコン・機能カード内の「お気に入りに登録」どちらかをクリックして登録してください。</p>
+      <!-- お気に入り登録方法の説明画像 (差し替え時は images/お気に入り_1.png / images/お気に入り_2.png を上書き) -->
+      <img src="images/お気に入り_1.png" alt="カード右上の★アイコンでお気に入り登録" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:16px 0;" />
+      <img src="images/お気に入り_2.png" alt="機能カード内のお気に入りに登録ボタン" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
     </div>
 
     <div class="tab-panel" id="tab-settings">
       <h3>基本設定</h3>
-      <p>（説明を後ほど追記）</p>
+
+      <h3>ページ設定確認</h3>
+      <p>印刷前や他者からファイルを受け取った際に、用紙サイズ・余白・文字サイズが意図した設定になっているかをすばやく確認できます。</p>
+      <img src="images/ページ設定確認.png" alt="ページ設定確認のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>用紙サイズ</h3>
+      <p>現在のドキュメントのページサイズをプルダウンから選択し変更します。</p>
+      <img src="images/用紙サイズ.png" alt="用紙サイズのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>文字サイズ</h3>
+      <p>対象テキストを選択後、文字サイズの数値を設定することができます。</p>
+      <img src="images/文字サイズ.png" alt="文字サイズのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>ページ余白</h3>
+      <p>上下左右の余白を設定することができます。</p>
+      <img src="images/ページ余白.png" alt="ページ余白のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>段組み</h3>
+      <p>新聞・チラシ・会報誌など、紙面を複数列に分けて見やすくしたい場合に使用します。選択範囲に段組みを設定することができます。</p>
+      <img src="images/段組み.png" alt="段組みのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>文字数・行数</h3>
+      <p>原稿用紙や社内規定フォーマットなど、1行の文字数・1ページの行数が決まっている文書を作成する際に使用します。1行に入る文字数・1ページに入る行数を設定できます。</p>
+      <img src="images/文字数・行数.png" alt="文字数・行数のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>スタイル管理</h3>
+      <p>「文書をスキャンして書式状況を確認」を押下すると、書式状況の一覧が表示されます。<br>
+      スタイルが当たっている／スタイルが上書きされている／未設定<br>
+      の３つの項目が表示されており、意図しない書式が当たっているテキストを正規化することができます。</p>
+      <p><strong>ステップ１</strong><br>文書をスキャンし、スタイルを検索</p>
+      <img src="images/スタイル管理_1.png" alt="スタイル管理 ステップ１" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+      <p><strong>ステップ２</strong><br>対象を一覧から選択し、適用されているスタイルを確認。スタイルの除去ができます。</p>
+      <img src="images/スタイル管理_2.png" alt="スタイル管理 ステップ２" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>目次・フィールド更新</h3>
+      <p>目次および文章内のフィールドを最新の状態に一括更新します。</p>
+      <img src="images/目次・フィールド更新.png" alt="目次・フィールド更新のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>変更履歴管理</h3>
+      <p>「変更の記録を開始」ボタンを押下すると変更が記録され始めます。<br>
+      「変更履歴の件数を確認」ボタンを押下すると、下部に変更履歴が一覧表示され、「全て承認する」ボタンから変更を確定することができます。</p>
+      <img src="images/変更履歴管理.png" alt="変更履歴管理のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>コメント管理</h3>
+      <p>校閲・レビューが完了した後、残ったコメントをまとめて整理したいときに使用します。「コメント件数を確認」ボタンを押下すると件数が表示され、「全て解決済みにする」ボタンからコメントを一括で解決済みにすることができます。</p>
+      <img src="images/コメント管理.png" alt="コメント管理のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>ヘッダー・フッター</h3>
+      <p><strong>個別ページ設定</strong><br>
+      ヘッダーフッターの設定方法を選択し、入力することができます。<br>
+      例：奇数ページ・中央・「MEIYUSHA」フッター入力</p>
+      <img src="images/ヘッダー・フッター_1.png" alt="ヘッダー・フッター 個別ページ設定" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+      <p><strong>ページ番号設定</strong><br>
+      設定方法を選択し、ページ番号を挿入することができます。</p>
+      <img src="images/ヘッダー・フッター_2.png" alt="ヘッダー・フッター ページ番号設定" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>図表番号</h3>
+      <p>図や表を追加・削除・並び替えした後に番号がずれた場合、一括で正しい通し番号に更新します。相互参照も同時に更新されます。</p>
+      <img src="images/図表番号.png" alt="図表番号のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>改ページ制御</h3>
+      <p>章の見出しや重要な段落を必ず新しいページから始めたい場合に使用します。選択した段落に改ページ設定を適用します。</p>
+      <img src="images/改ページ制御.png" alt="改ページ制御のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>脚注管理</h3>
+      <p>文書内に散在する脚注を一覧で把握したいときに使用します。「件数を確認・一覧表示」を押下すると、下部に一覧が作成されます。</p>
+      <img src="images/脚注管理_1.png" alt="脚注管理 ステップ１" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 8px;" />
+      <img src="images/脚注管理_2.png" alt="脚注管理 ステップ２" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:0 0 16px;" />
     </div>
 
     <div class="tab-panel" id="tab-typography">
       <h3>文字組</h3>
-      <p>（説明を後ほど追記）</p>
+
+      <h3>インデント</h3>
+      <p>選択した段落の左・最初の行・右のインデントを設定できます。</p>
+      <img src="images/インデント.png" alt="インデントのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>行間</h3>
+      <p>文書の読みやすさを調整したり、印刷時のページ収まりを整えたいときに使用します。選択行の行間を設定できます。</p>
+      <img src="images/行間.png" alt="行間のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>表</h3>
+      <p>行数・列数を指定して表を作成します。</p>
+      <img src="images/表.png" alt="表のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>フォント取得・置換</h3>
+      <p>他者から受け取ったファイルに意図しないフォントが混在しているときや、フォントを統一したいときに使用します。「取得」ボタンを押下するとドキュメントに使用されているフォント一覧が左窓に表示されます。<br>
+      変換元・変換先フォントを入力し「フォント置換」ボタンから実行することで置換することができます。</p>
+      <img src="images/フォント取得・置換.png" alt="フォント取得・置換のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>ルビ</h3>
+      <p>ルビ処理したい文字をカーソルで選択し「実行（自動ルビ）」ボタンを押してください。<br>
+      文字単位ごとにルビを振ることができます。<br>
+      また、任意で入力する場合は「ルビ入力（任意）」をご利用ください。<br>
+      ルビが振られているテキストを選択して「ルビを解除」から解除することもできます。</p>
+      <img src="images/ルビ.png" alt="ルビのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
     </div>
 
     <div class="tab-panel" id="tab-border">
       <h3>枠</h3>
-      <p>（説明を後ほど追記）</p>
+
+      <h3>画像挿入</h3>
+      <p>画像、図形ファイルなどを選択し、ドキュメント上に配置します。配置後は「レイアウトオプション」より、必要に応じて文字の折り返しを指定してください。</p>
+      <img src="images/画像挿入.png" alt="画像挿入のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>図形</h3>
+      <p>テキスト枠または、長方形を文章中のカーソルに合わせて文字・行数、または数値で枠を作成します。配置後は「レイアウトオプション」より、必要に応じて文字の折り返しを指定してください。<br>
+      枠の作成時、枠の種類をテキスト枠か長方形か選択してください。<br>
+      「サイズパレット」より、サイズ変更も可能です。</p>
+      <img src="images/図形.png" alt="図形のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
     </div>
 
     <div class="tab-panel" id="tab-formula">
       <h3>数式</h3>
-      <p>（説明を後ほど追記）</p>
+      <p>各種数式カード内のアイコンから目的の数式を入力することができます。</p>
+      <img src="images/数式.png" alt="数式のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
     </div>
 
     <div class="tab-panel" id="tab-template">
       <h3>定型文</h3>
-      <p>（説明を後ほど追記）</p>
+
+      <h3>定型文入力</h3>
+      <p>あらかじめスロットに入力したテキストを定型文として入力することができます。<br>
+      スロットを選択した状態で「文章よりコピー登録」を選択すると、ドキュメント内のテキストを定型文として登録することができます。</p>
+      <img src="images/定型文入力.png" alt="定型文入力のスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
+
+      <h3>記号スロット</h3>
+      <p>あらかじめ4種の括弧付き数字や丸付き数字などを登録しておき、「実行」ボタンを押すと連番入力することができます。<br>
+      例：⑴→⑵→⑶→⑷・・・</p>
+      <img src="images/記号スロット.png" alt="記号スロットのスクリーンショット" style="width:100%; border:1px solid #ddd; border-radius:6px; margin:8px 0 16px;" />
     </div>
   </section>
 
@@ -241,7 +366,7 @@
       </tr>
       <tr>
         <td>1.0.0</td>
-        <td>2026年4月</td>
+        <td>近日公開</td>
         <td>初回リリース</td>
       </tr>
     </table>

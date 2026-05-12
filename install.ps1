@@ -5,9 +5,9 @@
 
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$manifest_url    = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/manifest.xml"
-$dictServer_url  = "https://raw.githubusercontent.com/otayoshino/panel-for-word/master/dict-server.ps1"
-$dictBase_url    = "https://otayoshino.github.io/panel-for-word/dict"
+$manifest_url    = "https://raw.githubusercontent.com/meiyusha-dev/panel-for-word/master/manifest.xml"
+$dictServer_url  = "https://raw.githubusercontent.com/meiyusha-dev/panel-for-word/master/dict-server.ps1"
+$dictBase_url    = "https://meiyusha-dev.github.io/panel-for-word/dict"
 $addinFolder     = "C:\OfficeAddins"
 $dictFolder      = "$addinFolder\dict"
 $shareName       = "OfficeAddins"

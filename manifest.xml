@@ -9,7 +9,7 @@
   <Version>1.0.0.0</Version>
   <ProviderName>株式会社明友社</ProviderName>
   <DefaultLocale>ja-JP</DefaultLocale>
-  <DisplayName DefaultValue="かんたんツールボックス for Word" />
+  <DisplayName DefaultValue="かんたんルールパネル for Word" />
   <Description DefaultValue="フォント・段落・数式・表など、Wordの書式設定をすばやく操作できるタスクパネル型アドインです。" />
   <IconUrl DefaultValue="https://meiyusha-dev.github.io/panel-for-word/assets/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://meiyusha-dev.github.io/panel-for-word/assets/icon-64.png" />

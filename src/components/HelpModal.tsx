@@ -236,6 +236,18 @@ function ContactTab() {
   return (
     <>
       <div className={styles.section}>
+        <Text className={styles.sectionTitle}>サポートページ</Text>
+        <a
+          href="https://meiyusha-dev.github.io/panel-for-word/support.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: '11px', color: '#1e4d8c', fontFamily: "'Yu Gothic', 'Meiryo', sans-serif" }}
+        >
+          https://meiyusha-dev.github.io/panel-for-word/support.html
+        </a>
+      </div>
+      <div className={styles.divider} />
+      <div className={styles.section}>
         <Text className={styles.sectionTitle}>サポートへのお問い合わせ</Text>
         <Text className={styles.p}>
           ご不明点・ご要望は下記サイトのフォームからお問い合わせください。

@@ -55,7 +55,7 @@ export function Header({ currentFeature: _currentFeature, onBack: _onBack }: Hea
   return (
     <>
       <div className={styles.header}>
-        <Text className={styles.title}>かんたんルールパネル</Text>
+        <Text className={styles.title}>かんたんツールパネル</Text>
         <button
           className={styles.helpBtn}
           onClick={() => setHelpOpen(true)}

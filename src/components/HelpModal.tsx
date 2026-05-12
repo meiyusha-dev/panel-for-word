@@ -172,7 +172,7 @@ function GuideTab() {
       <div className={styles.section}>
         <Text className={styles.sectionTitle}>主要機能の概要</Text>
         <Text className={styles.p}>
-          かんたんルールパネルは、Wordの文書作成をサポートするアドインです。
+          かんたんツールパネルは、Wordの文書作成をサポートするアドインです。
           基本設定・文字組・数式入力などの機能をタブで切り替えて使用できます。
         </Text>
       </div>

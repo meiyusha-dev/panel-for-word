@@ -238,7 +238,8 @@ export function buildRubyOoxmlPreserving(ooxml: string, segmentPairs: RubyPair[]
       if (block.type === 'ruby') {
         content.push(block.xml)
       } else {
-        const pairs = segmentPairs[pairIdx++] ?? []
+        const blockText = extractRunSegments(block.xml).map(s => s.text).join('')
+        const pairs = blockText.length > 0 ? (segmentPairs[pairIdx++] ?? []) : []
         const segments = extractRunSegments(block.xml)
         const charRPr: string[] = []
         for (const seg of segments) for (const _ of seg.text) charRPr.push(seg.rPr)

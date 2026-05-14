@@ -5,7 +5,7 @@ import { SectionHeader } from '../../shared/SectionHeader'
 import { StatusBar } from '../../shared/StatusBar'
 import { useWordRun } from '../../../hooks/useWordRun'
 import { getTokenizer, textToRubyPairs } from '../../../utils/rubyKuromoji'
-import { buildRubyOoxml, buildManualRubyOoxml, removeRubyFromOoxml, containsKanji } from '../../../utils/rubyOoxml'
+import { buildRubyOoxml, buildManualRubyOoxml, buildRubyOoxmlPreserving, removeRubyFromOoxml, containsKanji, hasRubyInOoxml, getPlainTextSegments, getParagraphTexts } from '../../../utils/rubyOoxml'
 
 const useStyles = makeStyles({
   root: { display: 'flex', flexDirection: 'column', width: '100%', gap: tokens.spacingVerticalS },
@@ -44,6 +44,19 @@ const useStyles = makeStyles({
     fontWeight: '600',
     color: '#0c51a0',
   },
+  confirmBar: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXS,
+    backgroundColor: '#fff8f0',
+    border: '1px solid #f5d0a0',
+    borderRadius: '6px',
+    padding: '8px',
+  },
+  confirmButtons: {
+    display: 'flex',
+    gap: tokens.spacingHorizontalS,
+  },
 })
 
 export function RubyFeature() {
@@ -52,6 +65,8 @@ export function RubyFeature() {
   const [dictLoading, setDictLoading] = useState(false)
   const [dictReady, setDictReady] = useState(false)
   const [manualReading, setManualReading] = useState('')
+  const [confirmPending, setConfirmPending] = useState(false)
+  const [pendingOoxml, setPendingOoxml] = useState<string | null>(null)
 
   /** コンポーネントマウント時にバックグラウンドで辞書をロード開始 */
   useEffect(() => {
@@ -64,11 +79,23 @@ export function RubyFeature() {
       .finally(() => { setDictLoading(false) })
   }, [])
 
+  /** 確認後に pendingOoxml を現在の選択範囲に挿入 */
+  const handleConfirmApply = () =>
+    runWord(async (context) => {
+      if (!pendingOoxml) return
+      const range = context.document.getSelection()
+      range.insertOoxml(pendingOoxml, Word.InsertLocation.replace)
+      await context.sync()
+      setConfirmPending(false)
+      setPendingOoxml(null)
+    })
+
   /** 自動ルビ：選択テキストを形態素解析してルビを振る */
   const applyRuby = () =>
     runWord(async (context) => {
       const range = context.document.getSelection()
       range.load('text')
+      const ooxmlResult = range.getOoxml()
       await context.sync()
 
       const text = range.text
@@ -81,16 +108,34 @@ export function RubyFeature() {
         return
       }
 
-      let pairs
+      const selOoxml = ooxmlResult.value
+
+      if (hasRubyInOoxml(selOoxml)) {
+        const plainSegments = getPlainTextSegments(selOoxml)
+        let allPairs
+        try {
+          allPairs = await Promise.all(plainSegments.map(t => textToRubyPairs(t)))
+          setDictReady(true)
+        } catch (e) {
+          setStatus({ type: 'error', message: `辞書読み込みエラー: ${e instanceof Error ? e.message : String(e)}` })
+          return
+        }
+        setPendingOoxml(buildRubyOoxmlPreserving(selOoxml, allPairs))
+        setConfirmPending(true)
+        return
+      }
+
+      let paraPairs
       try {
-        pairs = await textToRubyPairs(text)
+        const paraTexts = getParagraphTexts(selOoxml)
+        paraPairs = await Promise.all(paraTexts.map(t => t ? textToRubyPairs(t) : Promise.resolve([])))
         setDictReady(true)
       } catch (e) {
         setStatus({ type: 'error', message: `辞書読み込みエラー: ${e instanceof Error ? e.message : String(e)}` })
         return
       }
 
-      const ooxml = buildRubyOoxml(pairs)
+      const ooxml = buildRubyOoxml(paraPairs, selOoxml)
       range.insertOoxml(ooxml, Word.InsertLocation.replace)
       await context.sync()
     })
@@ -100,6 +145,7 @@ export function RubyFeature() {
     runWord(async (context) => {
       const range = context.document.getSelection()
       range.load('text')
+      const ooxmlResult = range.getOoxml()
       await context.sync()
 
       const text = range.text
@@ -112,8 +158,15 @@ export function RubyFeature() {
         return
       }
 
-      const ooxml = buildManualRubyOoxml(text, manualReading)
-      range.insertOoxml(ooxml, Word.InsertLocation.replace)
+      const built = buildManualRubyOoxml(text, manualReading, ooxmlResult.value)
+
+      if (hasRubyInOoxml(ooxmlResult.value)) {
+        setPendingOoxml(built)
+        setConfirmPending(true)
+        return
+      }
+
+      range.insertOoxml(built, Word.InsertLocation.replace)
       await context.sync()
     })
 
@@ -122,11 +175,14 @@ export function RubyFeature() {
     runWord(async (context) => {
       const range = context.document.getSelection()
       const ooxmlResult = range.getOoxml()
-      await context.sync()
-
-      const cleaned = removeRubyFromOoxml(ooxmlResult.value)
-      range.insertOoxml(cleaned, Word.InsertLocation.replace)
-      await context.sync()
+      try {
+        await context.sync()
+        const cleaned = removeRubyFromOoxml(ooxmlResult.value)
+        range.insertOoxml(cleaned, Word.InsertLocation.replace)
+        await context.sync()
+      } catch {
+        setStatus({ type: 'error', message: '解除するテキスト全体を選択してください。' })
+      }
     })
 
   return (
@@ -153,6 +209,18 @@ export function RubyFeature() {
       <Button appearance="primary" className={styles.btnFull} onClick={applyRuby}>
         実行（自動ルビ）
       </Button>
+
+      {confirmPending && (
+        <div className={styles.confirmBar}>
+          <Text className={styles.note}>
+            すでにルビが振られた文字が含まれていますがよろしいですか？
+          </Text>
+          <div className={styles.confirmButtons}>
+            <Button size="small" appearance="primary" onClick={handleConfirmApply}>はい</Button>
+            <Button size="small" onClick={() => { setConfirmPending(false); setPendingOoxml(null) }}>キャンセル</Button>
+          </div>
+        </div>
+      )}
 
       {/* ── ルビ入力（任意） ── */}
       <div className={styles.subSection}>

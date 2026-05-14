@@ -241,6 +241,19 @@ const useStyles = makeStyles({
     flex: 1,
     fontSize: '11px',
   },
+  confirmBar: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXS,
+    backgroundColor: '#fff8f0',
+    border: '1px solid #f5d0a0',
+    borderRadius: '6px',
+    padding: '8px',
+  },
+  confirmButtons: {
+    display: 'flex',
+    gap: tokens.spacingHorizontalS,
+  },
 })
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -275,6 +288,14 @@ export function HeaderFooterFeature() {
   const [pageNumAlign, setPageNumAlign] = useState<AlignType>('centered')
   const [pageNumFormat, setPageNumFormat] = useState<PageNumFormat>('arabic')
   const [startingNumber, setStartingNumber] = useState(1)
+
+  // 確認ダイアログ
+  const [confirmPending, setConfirmPending] = useState(false)
+  const [pendingAction, setPendingAction] = useState<'apply' | 'insertPageNum' | null>(null)
+
+  // 解除対象
+  type ClearTarget = 'header' | 'footer' | 'both'
+  const [clearTarget, setClearTarget] = useState<ClearTarget>('both')
 
   const isTabEnabled = (pt: PageType): boolean => {
     if (pt === 'Primary') return true
@@ -343,87 +364,126 @@ export function HeaderFooterFeature() {
       setStatus({ type: 'success', message: '現在の設定を取得しました' })
     })
 
-  // 設定を適用
+  // 設定適用の共通ロジック（state をクロージャでキャプチャ）
+  const applyCore = async (context: Word.RequestContext) => {
+    const sections = context.document.sections
+    sections.load('items')
+    await context.sync()
+    const sec = sections.items[0]
+    const pageSetup = sec.pageSetup
+    pageSetup.differentFirstPageHeaderFooter = differentFirstPage
+    pageSetup.oddAndEvenPagesHeaderFooter = oddAndEven
+    await context.sync()
+
+    type HFEntry = { body: Word.Body; text: string; align: AlignType }
+    const entries: HFEntry[] = []
+    entries.push({ body: sec.getHeader('Primary' as Word.HeaderFooterType), text: headerText.Primary,    align: headerAlign.Primary })
+    entries.push({ body: sec.getFooter('Primary' as Word.HeaderFooterType), text: footerText.Primary,    align: footerAlign.Primary })
+    if (differentFirstPage) {
+      entries.push({ body: sec.getHeader('FirstPage' as Word.HeaderFooterType), text: headerText.FirstPage, align: headerAlign.FirstPage })
+      entries.push({ body: sec.getFooter('FirstPage' as Word.HeaderFooterType), text: footerText.FirstPage, align: footerAlign.FirstPage })
+    }
+    if (oddAndEven) {
+      entries.push({ body: sec.getHeader('EvenPages' as Word.HeaderFooterType), text: headerText.EvenPages, align: headerAlign.EvenPages })
+      entries.push({ body: sec.getFooter('EvenPages' as Word.HeaderFooterType), text: footerText.EvenPages, align: footerAlign.EvenPages })
+    }
+
+    for (const e of entries) e.body.insertText(e.text, 'Replace' as Word.InsertLocation.replace)
+    await context.sync()
+    for (const e of entries) e.body.paragraphs.load('items')
+    await context.sync()
+    for (const e of entries) {
+      if (e.body.paragraphs.items.length > 0)
+        e.body.paragraphs.items[0].alignment = e.align as Word.Alignment
+    }
+    await context.sync()
+    setStatus({ type: 'success', message: 'ヘッダー・フッターを設定しました' })
+  }
+
+  // ページ番号挿入の共通ロジック（state をクロージャでキャプチャ）
+  const insertPageNumCore = async (context: Word.RequestContext) => {
+    const sections = context.document.sections
+    sections.load('items')
+    await context.sync()
+    const sec = sections.items[0]
+    const target = pageNumTarget === 'header'
+      ? sec.getHeader(activeTab as Word.HeaderFooterType)
+      : sec.getFooter(activeTab as Word.HeaderFooterType)
+    target.insertOoxml(buildPageNumOoxml(pageNumFormat), 'Replace' as Word.InsertLocation.replace)
+    await context.sync()
+    target.paragraphs.load('items')
+    await context.sync()
+    if (target.paragraphs.items.length > 0)
+      target.paragraphs.items[0].alignment = pageNumAlign as Word.Alignment
+    await context.sync()
+    setStatus({ type: 'success', message: 'ページ番号を挿入しました' })
+  }
+
+  // 設定を適用：既存コンテンツがあれば確認、なければそのまま適用
   const handleApply = () =>
     runWord(async (context) => {
       const sections = context.document.sections
       sections.load('items')
       await context.sync()
-
       const sec = sections.items[0]
-      const pageSetup = sec.pageSetup
-
-      // フラグを先に設定
-      pageSetup.differentFirstPageHeaderFooter = differentFirstPage
-      pageSetup.oddAndEvenPagesHeaderFooter = oddAndEven
+      const ph = sec.getHeader('Primary' as Word.HeaderFooterType)
+      const pf = sec.getFooter('Primary' as Word.HeaderFooterType)
+      ph.load('text')
+      pf.load('text')
       await context.sync()
-
-      // 適用対象をリストアップ
-      type HFEntry = { body: Word.Body; text: string; align: AlignType }
-      const entries: HFEntry[] = []
-
-      entries.push({ body: sec.getHeader('Primary' as Word.HeaderFooterType), text: headerText.Primary,    align: headerAlign.Primary })
-      entries.push({ body: sec.getFooter('Primary' as Word.HeaderFooterType), text: footerText.Primary,    align: footerAlign.Primary })
-      if (differentFirstPage) {
-        entries.push({ body: sec.getHeader('FirstPage' as Word.HeaderFooterType), text: headerText.FirstPage, align: headerAlign.FirstPage })
-        entries.push({ body: sec.getFooter('FirstPage' as Word.HeaderFooterType), text: footerText.FirstPage, align: footerAlign.FirstPage })
+      if ((ph.text ?? '').trim() || (pf.text ?? '').trim()) {
+        setPendingAction('apply')
+        setConfirmPending(true)
+        return
       }
-      if (oddAndEven) {
-        entries.push({ body: sec.getHeader('EvenPages' as Word.HeaderFooterType), text: headerText.EvenPages, align: headerAlign.EvenPages })
-        entries.push({ body: sec.getFooter('EvenPages' as Word.HeaderFooterType), text: footerText.EvenPages, align: footerAlign.EvenPages })
-      }
-
-      // 1. テキストを一括 insertText
-      for (const e of entries) {
-        e.body.insertText(e.text, 'Replace' as Word.InsertLocation.replace)
-      }
-      await context.sync()
-
-      // 2. 段落を一括ロード
-      for (const e of entries) {
-        e.body.paragraphs.load('items')
-      }
-      await context.sync()
-
-      // 3. アライメントを一括設定
-      for (const e of entries) {
-        if (e.body.paragraphs.items.length > 0) {
-          e.body.paragraphs.items[0].alignment = e.align as Word.Alignment
-        }
-      }
-      await context.sync()
-      setStatus({ type: 'success', message: 'ヘッダー・フッターを設定しました' })
+      await applyCore(context)
     })
 
+  // ページ番号を挿入：既存コンテンツがあれば確認、なければそのまま挿入
   const handleInsertPageNum = () =>
     runWord(async (context) => {
       const sections = context.document.sections
       sections.load('items')
       await context.sync()
       const sec = sections.items[0]
-      sec.load('pageSetup')
-      await context.sync()
-      sec.pageSetup.load('restartNumberedLists')
-      await context.sync()
-      // startingPageNumber は Word.PageSetup に存在しないため insertOoxml で代替
-      // startingNumber の設定はスキップし、ページ番号フィールドのみ挿入する
-
       const target = pageNumTarget === 'header'
         ? sec.getHeader(activeTab as Word.HeaderFooterType)
         : sec.getFooter(activeTab as Word.HeaderFooterType)
-
-      // フィールドを挿入
-      target.insertOoxml(buildPageNumOoxml(pageNumFormat), 'Replace' as Word.InsertLocation.replace)
+      target.load('text')
       await context.sync()
+      if ((target.text ?? '').trim()) {
+        setPendingAction('insertPageNum')
+        setConfirmPending(true)
+        return
+      }
+      await insertPageNumCore(context)
+    })
 
-      // OOXML の <w:jc> はスタイルに上書きされるため、API で明示的に配置を設定
-      target.paragraphs.load('items')
+  // 確認ダイアログの「はい」
+  const handleConfirmApply = () => {
+    setConfirmPending(false)
+    const action = pendingAction
+    setPendingAction(null)
+    if (action === 'apply') runWord(applyCore)
+    else if (action === 'insertPageNum') runWord(insertPageNumCore)
+  }
+
+  const handleClear = () =>
+    runWord(async (context) => {
+      const sections = context.document.sections
+      sections.load('items')
       await context.sync()
-      if (target.paragraphs.items.length > 0) {
-        target.paragraphs.items[0].alignment = pageNumAlign as Word.Alignment
+      const sec = sections.items[0]
+      if (clearTarget === 'header' || clearTarget === 'both') {
+        sec.getHeader(activeTab as Word.HeaderFooterType)
+          .insertText('', 'Replace' as Word.InsertLocation.replace)
+      }
+      if (clearTarget === 'footer' || clearTarget === 'both') {
+        sec.getFooter(activeTab as Word.HeaderFooterType)
+          .insertText('', 'Replace' as Word.InsertLocation.replace)
       }
       await context.sync()
-      setStatus({ type: 'success', message: 'ページ番号を挿入しました' })
+      setStatus({ type: 'success', message: 'ヘッダー・フッターを解除しました' })
     })
 
   const handleDeletePageNum = () =>
@@ -541,6 +601,31 @@ export function HeaderFooterFeature() {
         設定を適用
       </Button>
 
+      <SectionHeader title="解除" />
+      <div className={styles.pageNumBox}>
+        <div className={styles.fieldRow}>
+          <Label size="small">解除対象（現在のタブに適用）</Label>
+          <div className={styles.alignRow}>
+            {([
+              { id: 'header', label: 'ヘッダーのみ' },
+              { id: 'footer', label: 'フッターのみ' },
+              { id: 'both',   label: '両方' },
+            ] as { id: ClearTarget; label: string }[]).map(t => (
+              <button
+                key={t.id}
+                className={clearTarget === t.id ? styles.alignBtnActive : styles.alignBtn}
+                onClick={() => setClearTarget(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <Button appearance="secondary" className={styles.btnFull} onClick={handleClear}>
+          解除を実行
+        </Button>
+      </div>
+
       <SectionHeader title="ページ番号" />
       <div className={styles.pageNumBox}>
         <div className={styles.fieldRow}>
@@ -606,6 +691,18 @@ export function HeaderFooterFeature() {
           </Button>
         </div>
       </div>
+
+      {confirmPending && (
+        <div className={styles.confirmBar}>
+          <Text style={{ fontSize: '11px' }}>
+            すでに入力されていますが、上書きしてもよろしいですか？
+          </Text>
+          <div className={styles.confirmButtons}>
+            <Button size="small" appearance="primary" onClick={handleConfirmApply}>はい</Button>
+            <Button size="small" onClick={() => { setConfirmPending(false); setPendingAction(null) }}>キャンセル</Button>
+          </div>
+        </div>
+      )}
 
       <StatusBar status={status} />
     </div>

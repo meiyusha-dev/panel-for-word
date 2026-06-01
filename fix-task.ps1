@@ -69,5 +69,5 @@ try {
     Write-Host ""
     Write-Host "エラーが発生しました: $_" -ForegroundColor Red
 } finally {
-    pause
+    Read-Host "Enterキーを押して閉じる"
 }

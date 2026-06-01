@@ -32,22 +32,29 @@ Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     try { $listener.Stop() } catch {}
 }
 
-# GetContext() を非同期化し、30秒ごとに Word プロセス存在チェックを行う。
-# Word が終了していればサーバーも自己停止することで、Windows シャットダウン時に
-# .NET CLR が強制終了される 0xc0000142 エラーを防ぐ。
+# WINWORDプロセスのExitedイベントで自動停止（最後の1プロセスが終了したらサーバー停止）
+$wordProcs = @(Get-Process WINWORD -ErrorAction SilentlyContinue)
+if ($wordProcs.Count -eq 0) {
+    Write-Log "No WINWORD process found. Stopping server."
+    $listener.Stop()
+} else {
+    $countdown = [System.Threading.CountdownEvent]::new($wordProcs.Count)
+    foreach ($p in $wordProcs) {
+        $p.EnableRaisingEvents = $true
+        $p.add_Exited({
+            if ($countdown.Signal()) {
+                Write-Log "All WINWORD processes exited. Stopping server."
+                $listener.Stop()
+            }
+        }.GetNewClosure())
+    }
+}
+
 while ($listener.IsListening) {
-    $async    = $listener.BeginGetContext($null, $null)
-    $signaled = $async.AsyncWaitHandle.WaitOne(30000)
+    $async = $listener.BeginGetContext($null, $null)
+    $async.AsyncWaitHandle.WaitOne(-1)
 
     if (-not $listener.IsListening) { break }
-
-    if (-not $signaled) {
-        if (-not (Get-Process WINWORD -ErrorAction SilentlyContinue)) {
-            Write-Log "WINWORD.EXE not running. Stopping server."
-            $listener.Stop()
-        }
-        continue
-    }
 
     try {
         $ctx = $listener.EndGetContext($async)

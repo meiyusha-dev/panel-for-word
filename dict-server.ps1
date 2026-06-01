@@ -1,7 +1,7 @@
 # ============================================================
 # Word Panel 辞書 HTTP サーバー
 # localhost:8642 で C:\OfficeAddins\dict\ を配信する
-# install.ps1 によりログオン時に自動起動されます
+# install.ps1 により Word 起動時に自動起動されます
 # ============================================================
 
 $port    = 8642
@@ -27,11 +27,32 @@ try {
     exit 1
 }
 
+# シャットダウン時に listener を安全に停止するハンドラ
+Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
+    try { $listener.Stop() } catch {}
+}
+
+# GetContext() を非同期化し、30秒ごとに Word プロセス存在チェックを行う。
+# Word が終了していればサーバーも自己停止することで、Windows シャットダウン時に
+# .NET CLR が強制終了される 0xc0000142 エラーを防ぐ。
 while ($listener.IsListening) {
+    $async    = $listener.BeginGetContext($null, $null)
+    $signaled = $async.AsyncWaitHandle.WaitOne(30000)
+
+    if (-not $listener.IsListening) { break }
+
+    if (-not $signaled) {
+        if (-not (Get-Process WINWORD -ErrorAction SilentlyContinue)) {
+            Write-Log "WINWORD.EXE not running. Stopping server."
+            $listener.Stop()
+        }
+        continue
+    }
+
     try {
-        $ctx    = $listener.GetContext()
-        $req    = $ctx.Request
-        $res    = $ctx.Response
+        $ctx = $listener.EndGetContext($async)
+        $req = $ctx.Request
+        $res = $ctx.Response
 
         # CORS ヘッダー（GitHub Pages の HTTPS コンテキストから呼び出されるため必須）
         $res.Headers.Add('Access-Control-Allow-Origin',  '*')
@@ -60,3 +81,4 @@ while ($listener.IsListening) {
         try { $ctx.Response.StatusCode = 500; $ctx.Response.Close() } catch {}
     }
 }
+Write-Log "Server stopped."

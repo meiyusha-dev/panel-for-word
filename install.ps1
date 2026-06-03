@@ -119,7 +119,7 @@ if ($coreOk) {
         Write-Warn $_.Exception.Message
     }
 
-    # 7. dict-server.ps1 を配置して Word 起動時タスクに登録
+    # 7. dict-server.ps1 / word-watcher.ps1 を配置して Word 起動時タスクに登録
     if ($dictOk) {
         Write-Step "辞書サーバーを設定しています..."
         try {
@@ -129,20 +129,26 @@ if ($coreOk) {
 
             Invoke-WebRequest -Uri $dictServer_url -OutFile "$addinFolder\dict-server.ps1" -UseBasicParsing
 
+            $watcherUrl = "https://raw.githubusercontent.com/meiyusha-dev/panel-for-word/master/word-watcher.ps1"
+            Invoke-WebRequest -Uri $watcherUrl -OutFile "$addinFolder\word-watcher.ps1" -UseBasicParsing
+
             # wscript.exe 経由で起動することで powershell.exe のウィンドウフラッシュを防ぐ
             $vbs = 'CreateObject("WScript.Shell").Run "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""C:\OfficeAddins\dict-server.ps1""", 0, False'
             Set-Content -Path "$addinFolder\launch-dict-server.vbs" -Value $vbs -Encoding ASCII
 
-            # WMI トリガー: WINWORD.EXE 起動時のみ dict-server を起動（ログオン時は起動しない）
-            $taskXml = @"
+            $watcherVbs = 'CreateObject("WScript.Shell").Run "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""C:\OfficeAddins\word-watcher.ps1""", 0, False'
+            Set-Content -Path "$addinFolder\launch-word-watcher.vbs" -Value $watcherVbs -Encoding ASCII
+
+            # LogonTrigger: ログオン時に word-watcher を起動（全Windowsエディション対応）
+            # word-watcher.ps1 が .NET ManagementEventWatcher で WINWORD 起動を監視し dict-server を起動する
+            $taskXml = @'
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo><Description>Word Panel 辞書サーバー (Word起動時のみ)</Description></RegistrationInfo>
+  <RegistrationInfo><Description>Word Panel dict server watcher (starts with Word)</Description></RegistrationInfo>
   <Triggers>
-    <WMIEventTrigger>
+    <LogonTrigger>
       <Enabled>true</Enabled>
-      <Subscription>SELECT * FROM __InstanceCreationEvent WITHIN 3 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = 'WINWORD.EXE'</Subscription>
-    </WMIEventTrigger>
+    </LogonTrigger>
   </Triggers>
   <Principals>
     <Principal id="Author">
@@ -154,24 +160,28 @@ if ($coreOk) {
     <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
     <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
     <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
-    <ExecutionTimeLimit>PT12H</ExecutionTimeLimit>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
     <Priority>7</Priority>
   </Settings>
   <Actions Context="Author">
     <Exec>
       <Command>wscript.exe</Command>
-      <Arguments>//B //NoLogo "$addinFolder\launch-dict-server.vbs"</Arguments>
+      <Arguments>//B //NoLogo "C:\OfficeAddins\launch-word-watcher.vbs"</Arguments>
     </Exec>
   </Actions>
 </Task>
-"@
-            # Register-ScheduledTask -Xml はWMIEventTriggerを解釈できないため schtasks.exe を使う
+'@
             $tmpXml = "$env:TEMP\wordpanel-task.xml"
             $taskXml | Set-Content -Path $tmpXml -Encoding Unicode
-            schtasks /Create /TN $taskName /XML $tmpXml /F 2>&1 | Out-Null
+            $result = schtasks /Create /TN $taskName /XML $tmpXml /F 2>&1
             Remove-Item $tmpXml -ErrorAction SilentlyContinue
-            Start-ScheduledTask -TaskName $taskName
-            Write-OK "辞書サーバータスク '$taskName' を登録・起動しました"
+            if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue) {
+                Start-ScheduledTask -TaskName $taskName
+                Write-OK "辞書サーバータスク '$taskName' を登録・起動しました"
+            } else {
+                Write-Warn "タスク登録に失敗しました: $result"
+                Write-Warn "fix-task.bat を管理者権限で実行してください"
+            }
         } catch {
             Write-Warn "辞書サーバーの設定をスキップしました"
             Write-Warn $_.Exception.Message

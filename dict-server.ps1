@@ -30,12 +30,18 @@ try {
 # シャットダウン時に listener を安全に停止するハンドラ
 Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     try { $listener.Stop() } catch {}
-}
+}.GetNewClosure()
 
 # WINWORDプロセスのExitedイベントで自動停止（最後の1プロセスが終了したらサーバー停止）
+# Word起動直後はランチャープロセスが一時的に死ぬため最大30秒待機する
+$waited = 0
+while ((Get-Process WINWORD -ErrorAction SilentlyContinue).Count -eq 0 -and $waited -lt 30) {
+    Start-Sleep 1
+    $waited++
+}
 $wordProcs = @(Get-Process WINWORD -ErrorAction SilentlyContinue)
 if ($wordProcs.Count -eq 0) {
-    Write-Log "No WINWORD process found. Stopping server."
+    Write-Log "No WINWORD process found after ${waited}s. Stopping server."
     $listener.Stop()
 } else {
     $countdown = [System.Threading.CountdownEvent]::new($wordProcs.Count)

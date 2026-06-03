@@ -4,8 +4,8 @@
 # Started at logon via scheduled task (LogonTrigger)
 # ============================================================
 
-$vbs     = 'C:\OfficeAddins\launch-dict-server.vbs'
-$port    = 8642
+$vbs  = 'C:\OfficeAddins\launch-dict-server.vbs'
+$port = 8642
 
 function Start-DictServer {
     $inUse = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
@@ -22,20 +22,14 @@ if (Get-Process WINWORD -ErrorAction SilentlyContinue) {
 
 $query   = "SELECT * FROM __InstanceCreationEvent WITHIN 3 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = 'WINWORD.EXE'"
 $watcher = New-Object System.Management.ManagementEventWatcher($query)
+
+# Use EventArrived (async) instead of WaitForNextEvent (blocking) to avoid
+# CLR teardown errors (0xc0000142) when Windows shuts down mid-wait
+$watcher.add_EventArrived({ Start-DictServer })
 $watcher.Start()
 
-try {
-    while ($true) {
-        try {
-            $null = $watcher.WaitForNextEvent()
-            Start-DictServer
-        } catch [System.Management.ManagementException] {
-            Start-Sleep 10
-            try { $watcher.Start() } catch {}
-        } catch {
-            Start-Sleep 5
-        }
-    }
-} finally {
+Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     try { $watcher.Stop(); $watcher.Dispose() } catch {}
-}
+}.GetNewClosure()
+
+while ($true) { Start-Sleep 60 }

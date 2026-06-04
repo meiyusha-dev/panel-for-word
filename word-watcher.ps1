@@ -20,16 +20,14 @@ if (Get-Process WINWORD -ErrorAction SilentlyContinue) {
     Start-DictServer
 }
 
-$query   = "SELECT * FROM __InstanceCreationEvent WITHIN 3 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = 'WINWORD.EXE'"
-$watcher = New-Object System.Management.ManagementEventWatcher($query)
-
-# Use EventArrived (async) instead of WaitForNextEvent (blocking) to avoid
-# CLR teardown errors (0xc0000142) when Windows shuts down mid-wait
-$watcher.add_EventArrived({ Start-DictServer })
-$watcher.Start()
-
-Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
-    try { $watcher.Stop(); $watcher.Dispose() } catch {}
-}.GetNewClosure()
-
-while ($true) { Start-Sleep 60 }
+# Poll for WINWORD instead of ManagementEventWatcher (WMI COM objects cause
+# CLR teardown errors (0xc0000142) when Windows forcibly terminates the process)
+$wasRunning = [bool](Get-Process WINWORD -ErrorAction SilentlyContinue)
+while ($true) {
+    Start-Sleep 3
+    $isRunning = [bool](Get-Process WINWORD -ErrorAction SilentlyContinue)
+    if ($isRunning -and -not $wasRunning) {
+        Start-DictServer
+    }
+    $wasRunning = $isRunning
+}

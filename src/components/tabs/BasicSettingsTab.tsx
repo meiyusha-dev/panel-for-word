@@ -358,7 +358,7 @@ export function BasicSettingsTab() {
         <FootnoteFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="ヘッダー・フッター設定" />
+        <SectionHeader title="ヘッダー/フッター設定" />
         <HeaderFooterFeature />
       </div>
       <div className={styles.section}>

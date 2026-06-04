@@ -58,8 +58,9 @@ if ($wordProcs.Count -eq 0) {
 
 while ($listener.IsListening) {
     $async = $listener.BeginGetContext($null, $null)
-    $async.AsyncWaitHandle.WaitOne(-1)
-
+    while (-not $async.AsyncWaitHandle.WaitOne(500)) {
+        if (-not $listener.IsListening) { break }
+    }
     if (-not $listener.IsListening) { break }
 
     try {

@@ -16,28 +16,26 @@ export function useWordRun() {
     }
   }
 
-  const runWord = async (action: (context: Word.RequestContext) => Promise<void>) => {
+  const runWord = async (action: (context: Word.RequestContext) => Promise<void>, onError?: (msg: string) => void) => {
     try {
       await Word.run(async (context) => {
         await action(context)
       })
     } catch (e) {
-      setStatus({
-        type: 'error',
-        message: `エラー: ${e instanceof Error ? e.message : String(e)}`,
-      })
+      const msg = `エラー: ${e instanceof Error ? e.message : String(e)}`
+      if (onError) onError(msg)
+      else setStatus({ type: 'error', message: msg })
     }
   }
 
   // Word.runをラップせずtry-catchのみ（内部で自前のWord.runを複数呼ぶ場合に使用）
-  const runRaw = async (action: () => Promise<void>) => {
+  const runRaw = async (action: () => Promise<void>, onError?: (msg: string) => void) => {
     try {
       await action()
     } catch (e) {
-      setStatus({
-        type: 'error',
-        message: `エラー: ${e instanceof Error ? e.message : String(e)}`,
-      })
+      const msg = `エラー: ${e instanceof Error ? e.message : String(e)}`
+      if (onError) onError(msg)
+      else setStatus({ type: 'error', message: msg })
     }
   }
 

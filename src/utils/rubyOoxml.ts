@@ -1,6 +1,13 @@
 // src/utils/rubyOoxml.ts
 // 選択テキストにルビを付けた OOXML pkg:package を生成するヘルパー
 
+export type RubyOptions = {
+  sizeFactor?: number
+  align?: 'distributeSpace' | 'center' | 'left' | 'right' | 'distributeLetter'
+  fontFamily?: string
+  color?: string
+}
+
 export type RubyPair = {
   base: string     // 元の文字（漢字を含む場合にルビを付ける）
   reading: string  // ひらがな読み
@@ -60,20 +67,26 @@ function extractSzFromRPr(rPr: string): number {
 }
 
 /** <w:rubyBase> の内容を文字列で受け取るバリアント */
-function buildRubyElementWithBaseXml(rubyBaseXml: string, reading: string, firstRPr = ''): string {
+function buildRubyElementWithBaseXml(rubyBaseXml: string, reading: string, firstRPr = '', options: RubyOptions = {}): string {
   const baseSz = extractSzFromRPr(firstRPr)
-  const hps = Math.max(10, Math.round(baseSz / 2))
+  const factor = options.sizeFactor ?? 0.5
+  const hps = Math.max(8, Math.round(baseSz * factor))
+  const align = options.align ?? 'distributeSpace'
+  const fontXml = options.fontFamily
+    ? `<w:rFonts w:ascii="${options.fontFamily}" w:hAnsi="${options.fontFamily}" w:eastAsia="${options.fontFamily}"/>`
+    : ''
+  const colorXml = options.color ? `<w:color w:val="${options.color}"/>` : ''
   return (
     `<w:ruby>` +
     `<w:rubyPr>` +
-    `<w:rubyAlign w:val="distributeSpace"/>` +
+    `<w:rubyAlign w:val="${align}"/>` +
     `<w:hps w:val="${hps}"/>` +
     `<w:hpsRaise w:val="${baseSz}"/>` +
     `<w:hpsBaseText w:val="${baseSz}"/>` +
     `<w:lid w:val="ja-JP"/>` +
     `</w:rubyPr>` +
     `<w:rt>` +
-    `<w:r><w:rPr><w:sz w:val="${hps}"/><w:szCs w:val="${hps}"/></w:rPr>` +
+    `<w:r><w:rPr>${fontXml}${colorXml}<w:sz w:val="${hps}"/><w:szCs w:val="${hps}"/></w:rPr>` +
     `<w:t>${escapeXml(reading)}</w:t></w:r>` +
     `</w:rt>` +
     `<w:rubyBase>${rubyBaseXml}</w:rubyBase>` +
@@ -154,7 +167,7 @@ function splitBodyIntoBlocks(bodyXml: string): OoxmlBlock[] {
 }
 
 /** RubyPair[][] (段落ごと) から挿入用 OOXML pkg:package 文字列を組み立て（自動ルビ用） */
-export function buildRubyOoxml(paragraphPairs: RubyPair[][], selectionOoxml: string): string {
+export function buildRubyOoxml(paragraphPairs: RubyPair[][], selectionOoxml: string, options: RubyOptions = {}): string {
   const paragraphs = extractParagraphs(selectionOoxml)
   const paragraphXmls: string[] = []
   for (let pi = 0; pi < paragraphs.length; pi++) {
@@ -169,7 +182,7 @@ export function buildRubyOoxml(paragraphPairs: RubyPair[][], selectionOoxml: str
     for (const { base, reading, hasKanji } of pairs) {
       const firstRPr = charRPr[idx] ?? ''
       const rubyBaseXml = buildMultiRunXml(base, idx, charRPr)
-      content.push(hasKanji ? buildRubyElementWithBaseXml(rubyBaseXml, reading, firstRPr) : rubyBaseXml)
+      content.push(hasKanji ? buildRubyElementWithBaseXml(rubyBaseXml, reading, firstRPr, options) : rubyBaseXml)
       idx += base.length
     }
     paragraphXmls.push(`<w:p>${pPr}${content.join('')}</w:p>`)
@@ -178,14 +191,14 @@ export function buildRubyOoxml(paragraphPairs: RubyPair[][], selectionOoxml: str
 }
 
 /** 選択テキスト全体に任意のルビを付ける OOXML を生成（任意ルビ用・単一段落のみ対応） */
-export function buildManualRubyOoxml(base: string, reading: string, selectionOoxml: string): string {
+export function buildManualRubyOoxml(base: string, reading: string, selectionOoxml: string, options: RubyOptions = {}): string {
   const cleanedOoxml = removeRubyFromOoxml(selectionOoxml)
   const segments = extractRunSegments(cleanedOoxml)
   const firstRPr = segments[0]?.rPr ?? ''
   const rubyBaseXml = segments.length > 0
     ? segments.map(s => `<w:r>${s.rPr}<w:t>${escapeXml(s.text)}</w:t></w:r>`).join('')
     : `<w:r><w:t>${escapeXml(base)}</w:t></w:r>`
-  return buildOoxmlPackage(buildRubyElementWithBaseXml(rubyBaseXml, reading, firstRPr))
+  return buildOoxmlPackage(buildRubyElementWithBaseXml(rubyBaseXml, reading, firstRPr, options))
 }
 
 /**
@@ -227,7 +240,7 @@ export function getPlainTextSegments(ooxml: string): string[] {
 }
 
 /** 既存ルビを保持しつつ、プレーンテキスト部分にのみルビを振った OOXML を生成 */
-export function buildRubyOoxmlPreserving(ooxml: string, segmentPairs: RubyPair[][]): string {
+export function buildRubyOoxmlPreserving(ooxml: string, segmentPairs: RubyPair[][], options: RubyOptions = {}): string {
   const paragraphs = extractParagraphs(ooxml)
   let pairIdx = 0
   const paragraphXmls: string[] = []
@@ -247,7 +260,7 @@ export function buildRubyOoxmlPreserving(ooxml: string, segmentPairs: RubyPair[]
         for (const { base, reading, hasKanji } of pairs) {
           const firstRPr = charRPr[idx] ?? ''
           const baseXml = buildMultiRunXml(base, idx, charRPr)
-          content.push(hasKanji ? buildRubyElementWithBaseXml(baseXml, reading, firstRPr) : baseXml)
+          content.push(hasKanji ? buildRubyElementWithBaseXml(baseXml, reading, firstRPr, options) : baseXml)
           idx += base.length
         }
       }

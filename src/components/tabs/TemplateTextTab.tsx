@@ -10,6 +10,7 @@ import {
   tokens,
   Text,
 } from '@fluentui/react-components'
+import { Add16Regular } from '@fluentui/react-icons'
 import { SectionHeader } from '../shared/SectionHeader'
 import { StatusBar } from '../shared/StatusBar'
 import { useWordRun } from '../../hooks/useWordRun'
@@ -76,7 +77,7 @@ const useStyles = makeStyles({
   radioLabel: {
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    minWidth: '64px',
+    minWidth: '80px',
   },
   symbolSlots: {
     display: 'grid',
@@ -121,6 +122,20 @@ const useStyles = makeStyles({
     fontSize: '11px',
     whiteSpace: 'nowrap',
   },
+  addSlotBtn: {
+    alignSelf: 'flex-start',
+    color: tokens.colorBrandForeground1,
+  },
+  stickyActions: {
+    position: 'sticky',
+    bottom: 0,
+    backgroundColor: '#ffffff',
+    paddingTop: tokens.spacingVerticalS,
+    zIndex: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXS,
+  },
 })
 
 export function TemplateTextTab() {
@@ -141,6 +156,13 @@ export function TemplateTextTab() {
     loadSetting<number[]>(SETTINGS_KEY_SLOT_INDICES, Array(SLOT_COUNT).fill(0))
   )
   const [activeSlot, setActiveSlot] = useState(0)
+
+  // ── スロット追加 ──────────────────────────────────────────────────────
+  const addSlot = () => {
+    const next = [...templates, '']
+    setTemplates(next)
+    saveSetting(SETTINGS_KEY_TEMPLATE, next)
+  }
 
   // ── 定型文を更新して保存 ──────────────────────────────────────────────
   const updateTemplate = (idx: number, value: string) => {
@@ -238,17 +260,28 @@ export function TemplateTextTab() {
             </div>
           ))}
         </RadioGroup>
-        <div className={styles.row}>
-          <Button appearance="secondary" className={styles.btnFull} onClick={copyFromSelection}>
-            文章よりコピー登録
-          </Button>
-          <Button appearance="primary" className={styles.btnFull} onClick={insertTemplate}>
-            実行
-          </Button>
+        <Button
+          appearance="subtle"
+          icon={<Add16Regular />}
+          onClick={addSlot}
+          size="small"
+          className={styles.addSlotBtn}
+        >
+          スロットを追加
+        </Button>
+        <div className={styles.stickyActions}>
+          <div className={styles.row}>
+            <Button appearance="secondary" className={styles.btnFull} onClick={copyFromSelection}>
+              文章よりコピー登録
+            </Button>
+            <Button appearance="primary" className={styles.btnFull} onClick={insertTemplate}>
+              実行
+            </Button>
+          </div>
+          <Text size={100} className={styles.hint}>
+            ダイアログボックスでラジオボタンを選択してから「実行」を押すと挿入されます。
+          </Text>
         </div>
-        <Text size={100} className={styles.hint}>
-          ダイアログボックスでラジオボタンを選択してから「実行」を押すと挿入されます。
-        </Text>
       </div>
 
       {/* ── 記号入力 ── */}

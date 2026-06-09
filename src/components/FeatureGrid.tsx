@@ -129,7 +129,7 @@ const ALL_FEATURES: FeatureItem[] = [
   },
   {
     id: 'font-replace',
-    label: 'フォント取得・置換',
+    label: 'フォント検索・置換',
     tabId: 'typography',
     icon: <ArrowSortRegular fontSize={24} />,
     tooltip: 'ドキュメント使用フォントの一覧取得・一括置換',
@@ -140,8 +140,8 @@ const ALL_FEATURES: FeatureItem[] = [
     tabId: 'typography',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="12" y="9" textAnchor="middle" fontSize="6" fill="currentColor" fontFamily="serif">・</text>
-        <text x="12" y="20" textAnchor="middle" fontSize="11" fill="currentColor" fontFamily="serif">漢</text>
+        <text x="12" y="8" textAnchor="middle" fontSize="9" fill="currentColor" fontFamily="serif">かん</text>
+        <text x="12" y="21" textAnchor="middle" fontSize="13" fill="currentColor" fontFamily="serif">漢</text>
       </svg>
     ),
     tooltip: '漢字への自動ルビ・任意ルビの適用、ルビ解除ができます',
@@ -453,6 +453,7 @@ interface FeatureGridProps {
   favorites: string[]
   onToggleFavorite: (featureId: string) => void
   onReorderFavorites?: (newOrder: string[]) => void
+  slideDirection?: 'left' | 'right' | null
 }
 
 const useStyles = makeStyles({
@@ -463,6 +464,28 @@ const useStyles = makeStyles({
     padding: '12px',
     width: '100%',
     boxSizing: 'border-box',
+  },
+  slideWrapper: {
+    overflow: 'hidden',
+    width: '100%',
+  },
+  slideInFromRight: {
+    animationName: {
+      from: { transform: 'translateX(100%)' },
+      to: { transform: 'translateX(0)' },
+    },
+    animationDuration: '200ms',
+    animationTimingFunction: 'ease-out',
+    animationFillMode: 'both',
+  },
+  slideInFromLeft: {
+    animationName: {
+      from: { transform: 'translateX(-100%)' },
+      to: { transform: 'translateX(0)' },
+    },
+    animationDuration: '200ms',
+    animationTimingFunction: 'ease-out',
+    animationFillMode: 'both',
   },
   card: {
     position: 'relative',
@@ -587,7 +610,7 @@ const useStyles = makeStyles({
 
 type TooltipState = { id: string; x: number; y: number; cardTop: number; text: string }
 
-export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onReorderFavorites }: FeatureGridProps) {
+export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onReorderFavorites, slideDirection }: FeatureGridProps) {
   const styles = useStyles()
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -680,6 +703,11 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onRe
 
   return (
     <>
+      <div className={mergeClasses(
+        styles.slideWrapper,
+        slideDirection === 'right' && styles.slideInFromRight,
+        slideDirection === 'left' && styles.slideInFromLeft,
+      )}>
       <div className={styles.grid} role="list">
         {tabId === 'favorites' && features.length === 0 && (
           <div className={styles.emptyState}>
@@ -728,6 +756,7 @@ export function FeatureGrid({ tabId, onSelect, favorites, onToggleFavorite, onRe
             <Text className={styles.label}>{feature.label}</Text>
           </div>
         ))}
+      </div>
       </div>
       {tooltip && createPortal(
         <div

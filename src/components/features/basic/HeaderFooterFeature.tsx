@@ -9,6 +9,12 @@ import {
   makeStyles,
   tokens,
   Label,
+  Dialog,
+  DialogSurface,
+  DialogBody,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@fluentui/react-components'
 import { SectionHeader } from '../../shared/SectionHeader'
 import { StatusBar } from '../../shared/StatusBar'
@@ -275,18 +281,28 @@ const useStyles = makeStyles({
     flex: 1,
     fontSize: '11px',
   },
-  confirmBar: {
+  fixedFooter: {
+    position: 'sticky',
+    bottom: 0,
+    borderTop: '2px solid #c5dcf5',
+    paddingTop: tokens.spacingVerticalS,
+    paddingBottom: '10px',
+    marginTop: tokens.spacingVerticalXS,
+    marginBottom: '-10px',
+    backgroundColor: '#ffffff',
     display: 'flex',
     flexDirection: 'column',
-    gap: tokens.spacingVerticalXS,
-    backgroundColor: '#fff8f0',
-    border: '1px solid #f5d0a0',
-    borderRadius: '6px',
-    padding: '8px',
+    gap: tokens.spacingVerticalS,
   },
-  confirmButtons: {
-    display: 'flex',
-    gap: tokens.spacingHorizontalS,
+  subLabel: {
+    fontSize: '11px',
+    fontWeight: '600',
+    color: '#0c51a0',
+  },
+  note: {
+    fontSize: '11px',
+    color: tokens.colorNeutralForeground2,
+    lineHeight: '1.6',
   },
 })
 
@@ -650,31 +666,6 @@ export function HeaderFooterFeature() {
         設定を適用
       </Button>
 
-      <SectionHeader title="解除" />
-      <div className={styles.pageNumBox}>
-        <div className={styles.fieldRow}>
-          <Label size="small">解除対象（現在のタブに適用）</Label>
-          <div className={styles.alignRow}>
-            {([
-              { id: 'header', label: 'ヘッダーのみ' },
-              { id: 'footer', label: 'フッターのみ' },
-              { id: 'both',   label: '両方' },
-            ] as { id: ClearTarget; label: string }[]).map(t => (
-              <button
-                key={t.id}
-                className={clearTarget === t.id ? styles.alignBtnActive : styles.alignBtn}
-                onClick={() => setClearTarget(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <Button appearance="secondary" className={styles.btnFull} onClick={handleClear}>
-          解除を実行
-        </Button>
-      </div>
-
       <SectionHeader title="ページ番号" />
       <div className={styles.pageNumBox}>
         <div className={styles.fieldRow}>
@@ -741,17 +732,46 @@ export function HeaderFooterFeature() {
         </div>
       </div>
 
-      {confirmPending && (
-        <div className={styles.confirmBar}>
-          <Text style={{ fontSize: '11px' }}>
-            すでに入力されていますが、上書きしてもよろしいですか？
-          </Text>
-          <div className={styles.confirmButtons}>
-            <Button size="small" appearance="primary" onClick={handleConfirmApply}>はい</Button>
-            <Button size="small" onClick={() => { setConfirmPending(false); setPendingAction(null) }}>キャンセル</Button>
-          </div>
+      <Dialog
+        open={confirmPending}
+        onOpenChange={(_e, data) => { if (!data.open) { setConfirmPending(false); setPendingAction(null) } }}
+      >
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>上書き確認</DialogTitle>
+            <DialogContent>
+              すでに入力されていますが、上書きしてもよろしいですか？
+            </DialogContent>
+            <DialogActions>
+              <Button appearance="secondary" onClick={() => { setConfirmPending(false); setPendingAction(null) }}>キャンセル</Button>
+              <Button appearance="primary" onClick={handleConfirmApply}>はい</Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+
+      <div className={styles.fixedFooter}>
+        <Text className={styles.subLabel}>解除</Text>
+        <Text className={styles.note}>解除対象（現在のタブに適用）</Text>
+        <div className={styles.alignRow}>
+          {([
+            { id: 'header', label: 'ヘッダーのみ' },
+            { id: 'footer', label: 'フッターのみ' },
+            { id: 'both',   label: '両方' },
+          ] as { id: ClearTarget; label: string }[]).map(t => (
+            <button
+              key={t.id}
+              className={clearTarget === t.id ? styles.alignBtnActive : styles.alignBtn}
+              onClick={() => setClearTarget(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
-      )}
+        <Button appearance="secondary" className={styles.btnFull} onClick={handleClear}>
+          解除を実行
+        </Button>
+      </div>
 
       <StatusBar status={status} />
     </div>

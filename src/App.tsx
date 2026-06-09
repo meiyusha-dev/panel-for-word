@@ -109,14 +109,14 @@ const useStyles = makeStyles({
   tabItem: {
     flex: 1,
     padding: '6px 4px',
-    fontSize: '9px',
+    fontSize: '11px',
     color: '#7fb5e8',
     backgroundColor: 'transparent',
     border: 'none',
     borderRadius: '6px 6px 0 0',
     cursor: 'pointer',
     fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
-    fontWeight: '400',
+    fontWeight: '700',
     appearance: 'none',
     textAlign: 'center',
     whiteSpace: 'nowrap',
@@ -127,13 +127,13 @@ const useStyles = makeStyles({
   },
   backButton: {
     padding: '6px 10px',
-    fontSize: '9px',
+    fontSize: '11px',
     color: '#ffffff',
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
     fontFamily: "'Yu Gothic', 'Meiryo', sans-serif",
-    fontWeight: '400',
+    fontWeight: '700',
     appearance: 'none',
     textAlign: 'left',
     whiteSpace: 'nowrap',
@@ -159,9 +159,9 @@ const useStyles = makeStyles({
   tabSelected: {
     flex: 1,
     padding: '6px 4px',
-    fontSize: '9px',
+    fontSize: '11px',
     color: '#0c51a0',
-    fontWeight: '500',
+    fontWeight: '700',
     backgroundColor: '#f5f9ff',
     border: 'none',
     borderRadius: '6px 6px 0 0',
@@ -180,6 +180,11 @@ const useStyles = makeStyles({
     boxSizing: 'border-box',
     width: '100%',
   },
+  bodyFeature: {
+    overflowY: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
   featurePanel: {
     backgroundColor: '#ffffff',
     border: '1px solid #c5dcf5',
@@ -187,6 +192,10 @@ const useStyles = makeStyles({
     padding: '10px',
     width: '100%',
     boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    overflowY: 'auto',
   },
   favRow: {
     display: 'flex',
@@ -234,6 +243,8 @@ const DEFAULT_FAVORITES = [
 export default function App() {
   const styles = useStyles()
   const [activeTab, setActiveTab] = useState<TabId>('favorites')
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
+  const [animationKey, setAnimationKey] = useState(0)
   // 選択中の機能（null = メイン画面、non-null = 設定画面）
   const [currentFeature, setCurrentFeature] = useState<FeatureItem | null>(null)
 
@@ -329,7 +340,15 @@ export default function App() {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 className={activeTab === tab.id ? styles.tabSelected : styles.tabItem}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  const newIndex = TABS.findIndex((t) => t.id === tab.id)
+                  const oldIndex = TABS.findIndex((t) => t.id === activeTab)
+                  if (newIndex !== oldIndex) {
+                    setSlideDirection(newIndex > oldIndex ? 'right' : 'left')
+                    setAnimationKey((k) => k + 1)
+                    setActiveTab(tab.id)
+                  }
+                }}
               >
                 {tab.label}
               </button>
@@ -340,7 +359,7 @@ export default function App() {
                 className={styles.backButton}
                 onClick={() => setCurrentFeature(null)}
               >
-                ← 戻る
+                ＜ 戻る
               </button>
               <span className={styles.featureName}>{currentFeature.label}</span>
             </>
@@ -348,10 +367,13 @@ export default function App() {
         </div>
 
         {/* ── ボディ ── */}
-        <div className={styles.body} role="tabpanel">
+        <div className={`${styles.body}${currentFeature ? ` ${styles.bodyFeature}` : ''}`} role="tabpanel">
           {currentFeature === null ? (
             // メイン画面：現在のタブの機能カードグリッドを表示
-            <FeatureGrid tabId={activeTab} onSelect={setCurrentFeature} favorites={favorites} onToggleFavorite={toggleFavorite} onReorderFavorites={reorderFavorites} />
+            <FeatureGrid key={animationKey} tabId={activeTab} onSelect={(feature) => {
+                setSlideDirection(null)
+                setCurrentFeature(feature)
+              }} favorites={favorites} onToggleFavorite={toggleFavorite} onReorderFavorites={reorderFavorites} slideDirection={slideDirection} />
           ) : (
             // 設定画面：お気に入りボタン ＋ 白背景パネル
             <>

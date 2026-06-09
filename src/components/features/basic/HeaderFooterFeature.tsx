@@ -358,8 +358,6 @@ export function HeaderFooterFeature() {
   type ClearTarget = 'header' | 'footer' | 'both'
   const [clearTarget, setClearTarget] = useState<ClearTarget>('both')
 
-  const isTabEnabled = (_pt: PageType): boolean => true
-
   // 現在の設定を取得
   const handleGetInfo = () =>
     runWord(async (context) => {

@@ -139,8 +139,8 @@ export function CommentsFeature() {
         index: i + 1,
         targetText: (c.contentRange.text ?? '').replace(/\n/g, ' ').slice(0, 40),
         author: c.authorName ?? '',
-        date: c.date
-          ? new Date(c.date).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        date: c.creationDate
+          ? new Date(c.creationDate).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
           : '',
         content: (c.content ?? '').replace(/\n/g, ' ').slice(0, 60),
         resolved: !!c.resolved,

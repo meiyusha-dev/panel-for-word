@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     border: `1px solid ${tokens.colorNeutralStroke2}`,
     flexShrink: 0,
-    ':hover': { borderColor: tokens.colorBrandStroke1 },
+    ':hover': { border: `1px solid ${tokens.colorBrandStroke1}` },
   },
   thumbEmpty: {
     width: '60px',

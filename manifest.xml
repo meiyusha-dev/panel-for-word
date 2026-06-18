@@ -9,8 +9,12 @@
   <Version>1.0.0.0</Version>
   <ProviderName>株式会社明友社</ProviderName>
   <DefaultLocale>ja-JP</DefaultLocale>
-  <DisplayName DefaultValue="かんたんツールパネル for Word" />
-  <Description DefaultValue="フォント・段落・数式・表など、Wordの書式設定をすばやく操作できるタスクパネル型アドインです。" />
+  <DisplayName DefaultValue="かんたんツールパネル for Word">
+    <bt:Override Locale="en-US" Value="Easy Tool Panel for Word" />
+  </DisplayName>
+  <Description DefaultValue="フォント・段落・数式・表など、Wordの書式設定をすばやく操作できるタスクパネル型アドインです。">
+    <bt:Override Locale="en-US" Value="A task pane add-in for Word that lets you quickly manage fonts, paragraphs, formulas, tables, and other document formatting settings." />
+  </Description>
   <IconUrl DefaultValue="https://meiyusha-dev.github.io/panel-for-word/assets/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://meiyusha-dev.github.io/panel-for-word/assets/icon-64.png" />
   <SupportUrl DefaultValue="https://meiyusha-dev.github.io/panel-for-word/support.html" />

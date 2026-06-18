@@ -3,3 +3,6 @@ dist/
 certs/
 public/dict/
 _dev/
+public/screenshots/
+.agents/
+.claude/worktrees/

@@ -205,7 +205,7 @@ export function FrameAlignFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="枠揃え" />
+      <SectionHeader title="枠揃え" helpText="複数の図形やテキストボックスを選択して、左端・右端・上端・下端・中央などに一括で揃えます。等間隔に並べることもでき、手動で位置を調整するよりも素早くきれいにレイアウトを整えられます。" />
       <div className={styles.grid3}>
         <Button appearance="secondary" className={styles.btnFull} onClick={() => handleAlign('left')}>
           左揃え

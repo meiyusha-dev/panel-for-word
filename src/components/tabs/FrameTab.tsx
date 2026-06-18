@@ -96,7 +96,7 @@ export function FrameTab() {
     <div className={styles.root}>
 
       <div className={styles.section}>
-        <SectionHeader title="画像・オブジェクト挿入" />
+        <SectionHeader title="画像・オブジェクト挿入" helpText="サンプル" />
         <Text size={200}>画像・図形を文章内に挿入します。カーソル位置に挿入されます。</Text>
         <input
           ref={fileInputRef}
@@ -111,7 +111,7 @@ export function FrameTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="テキスト枠作成（ContentControl）" />
+        <SectionHeader title="テキスト枠作成（ContentControl）" helpText="サンプル" />
         <MessageBar intent="warning">
           <MessageBarBody>
             Office.jsではテキストボックスの直接作成はできません。
@@ -131,7 +131,7 @@ export function FrameTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="非対応機能" />
+        <SectionHeader title="非対応機能" helpText="サンプル" />
         <div className={styles.noticeBox}>
           <Text size={200} block className={styles.preWrap}>
             以下の機能は Office.js では実現できないため廃止しています：{'\n'}

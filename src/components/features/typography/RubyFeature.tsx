@@ -280,7 +280,7 @@ export function RubyFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="ルビ" />
+      <SectionHeader title="ルビ" helpText="選択した漢字などにふりがな（ルビ）を付けたり、まとめて削除したりします。自動で読み仮名を生成するほか、手動で任意のルビを指定することもできます。教材・案内文書など、読み手を選ばない文書作りに役立ちます。" />
 
       {/* ── 詳細設定 ── */}
       <div className={styles.settingsContainer}>

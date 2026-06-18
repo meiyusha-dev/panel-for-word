@@ -208,7 +208,7 @@ export function FractionFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="分数" />
+      <SectionHeader title="分数" helpText="数式の中に分数（上に分子、下に分母を表示する形）を挿入します。縦に積み重なるタテ分数、横に並ぶ斜め分数など複数の形式から選べます。" />
 
       <div className={styles.grid}>
         {FRAC_ITEMS.map((item) => (

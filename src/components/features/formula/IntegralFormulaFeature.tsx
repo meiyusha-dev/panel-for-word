@@ -239,13 +239,13 @@ export function IntegralFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="積分" />
+      <SectionHeader title="積分" helpText="∫（インテグラル）記号を使った積分の数式を挿入します。積分とは、面積や累積量を求める数学の操作です。上限・下限付き（定積分）と付かない（不定積分）を選べます。" />
       {renderGrid(INTEGRAL_ITEMS, handleIntegral)}
 
-      <SectionHeader title="線積分" />
+      <SectionHeader title="線積分" helpText="曲線や閉曲線に沿って積分する「線積分」の記号（∮ など）を挿入します。物理・電磁気学などで使われます。" />
       {renderGrid(LINE_INT_ITEMS, handleLineInt)}
 
-      <SectionHeader title="微分" />
+      <SectionHeader title="微分" helpText="微分（変化の割合・瞬間の速さを求める操作）に使う記号や数式構造（dy/dx 形式、プライム記号 f' など）を挿入します。" />
       {renderGrid(DIFF_ITEMS, handleDiff)}
 
       {tooltip && createPortal(

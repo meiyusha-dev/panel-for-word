@@ -299,19 +299,19 @@ export function MatrixFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="空行列" />
+      <SectionHeader title="空行列" helpText="行数と列数を指定した空の行列（マトリクス）の枠を挿入します。行列とは数値を縦横に並べた表のような構造で、数式の中で連立方程式や変換を表すときに使います。" />
       {renderGrid(EMPTY_ITEMS, 4)}
 
-      <SectionHeader title="ドット" />
+      <SectionHeader title="ドット" helpText="行列内で要素の省略を表す点（横点 ⋯・縦点 ⋮・斜め点 ⋱）を挿入します。「続きがある」ことを示すために使います。" />
       {renderGrid(DOT_ITEMS, 4)}
 
-      <SectionHeader title="単位行列" />
+      <SectionHeader title="単位行列" helpText="対角線上の要素だけが 1 で、それ以外は 0 の行列（単位行列）を挿入します。行列の掛け算で「何もしない変換」を表す特別な行列です。" />
       {renderGrid(IDENTITY_ITEMS, 4)}
 
-      <SectionHeader title="かっこ付き行列" />
+      <SectionHeader title="かっこ付き行列" helpText="( )・[ ]・| | などのかっこで囲まれた行列を挿入します。かっこの種類によって行列式・行列・ベクトルなどの意味が変わります。" />
       {renderGrid(BRACKET_ITEMS, 4)}
 
-      <SectionHeader title="疎行列" />
+      <SectionHeader title="疎行列" helpText="ほとんどの要素が 0 で、一部だけに値がある行列（疎行列）の表記を挿入します。省略点（⋱）を使って大きな行列をコンパクトに表現するときに使います。" />
       {renderGrid(SPARSE_ITEMS, 2)}
 
       {tooltip && createPortal(

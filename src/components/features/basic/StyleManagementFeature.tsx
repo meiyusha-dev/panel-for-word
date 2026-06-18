@@ -1,20 +1,13 @@
 // src/components/features/basic/StyleManagementFeature.tsx
 // スタイル管理 — 直接上書き書式の可視化・選択的正規化
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Button,
   Checkbox,
   Text,
   makeStyles,
   tokens,
-  Dialog,
-  DialogTrigger,
-  DialogSurface,
-  DialogTitle,
-  DialogBody,
-  DialogActions,
-  DialogContent,
 } from '@fluentui/react-components'
 import { SectionHeader } from '../../shared/SectionHeader'
 import { StatusBar } from '../../shared/StatusBar'
@@ -172,6 +165,28 @@ export function StyleManagementFeature() {
       ].join(','))
       await context.sync()
 
+      // スタイルのインデント基準値を取得（直接上書き判定に使用）
+      const styleNames = [...new Set(paras.items.map(p => p.style ?? 'Normal'))]
+      const styleIndentMap: Record<string, { left: number; right: number; firstLine: number }> = {}
+      for (const name of styleNames) {
+        try {
+          const style = context.document.getStyleByNameOrNullObject(name)
+          style.paragraphFormat.load('leftIndent,rightIndent,firstLineIndent')
+          await context.sync()
+          if (!style.isNullObject) {
+            styleIndentMap[name] = {
+              left:      style.paragraphFormat.leftIndent      ?? 0,
+              right:     style.paragraphFormat.rightIndent     ?? 0,
+              firstLine: style.paragraphFormat.firstLineIndent ?? 0,
+            }
+          } else {
+            styleIndentMap[name] = { left: 0, right: 0, firstLine: 0 }
+          }
+        } catch {
+          styleIndentMap[name] = { left: 0, right: 0, firstLine: 0 }
+        }
+      }
+
       // スタイル未設定チェック（見出し候補がNormalのままか）
       let hasUnstyledHeading = false
       const result: ParagraphAnalysis[] = paras.items.map((para, i) => {
@@ -186,15 +201,17 @@ export function StyleManagementFeature() {
           hasUnstyledHeading = true
         }
 
-        // 直接上書きの検出（値が存在することを確認）
+        const styleBase = styleIndentMap[styleName] ?? { left: 0, right: 0, firstLine: 0 }
+
+        // 直接上書きの検出：スタイル基準値と異なる場合のみ上書きと判定
         const overrides: Partial<OverrideFlags> = {}
         if (para.font.bold === true) overrides.bold = true
         if (para.font.italic === true) overrides.italic = true
         if (para.font.underline && para.font.underline !== 'None') overrides.underline = true
         if (para.font.color && para.font.color !== '' && para.font.color.toUpperCase() !== '#000000') overrides.fontColor = true
-        if (para.leftIndent && para.leftIndent !== 0) overrides.leftIndent = true
-        if (para.rightIndent && para.rightIndent !== 0) overrides.rightIndent = true
-        if (para.firstLineIndent && para.firstLineIndent !== 0) overrides.firstLineIndent = true
+        if ((para.leftIndent ?? 0) !== styleBase.left) overrides.leftIndent = true
+        if ((para.rightIndent ?? 0) !== styleBase.right) overrides.rightIndent = true
+        if ((para.firstLineIndent ?? 0) !== styleBase.firstLine) overrides.firstLineIndent = true
 
         const hasOverride = Object.values(overrides).some(Boolean)
         const status: ParagraphAnalysis['status'] =
@@ -215,30 +232,69 @@ export function StyleManagementFeature() {
       setSelected(null)
       setShowUnstyled(hasUnstyledHeading)
       setStep(1)
-      setStatus({ type: 'success', message: `${result.length} 段落をスキャンしました` })
+      setStatus(null)
     })
+
+  // mount時に自動スキャン
+  useEffect(() => { handleScan() }, [])
 
   // ── Step3: 選択的正規化 ──────────────────────────────────────────────
   const handleRemoveSelected = () => {
     if (selected === null) return
     runWord(async (context) => {
       const paras = context.document.body.paragraphs
-      paras.load('items')
+      paras.load('items,style')
       await context.sync()
       const para = paras.items[selected]
-      if (removeChecks.bold)            (para.font as any).bold = false
-      if (removeChecks.italic)          (para.font as any).italic = false
-      if (removeChecks.underline)       (para.font as any).underline = 'none'
-      if (removeChecks.fontColor)       para.font.color = '#000000'
-      if (removeChecks.lineSpacing)     (para as any).lineSpacingRule = 'auto'
-      if (removeChecks.leftIndent)      para.leftIndent = 0
-      if (removeChecks.rightIndent)     para.rightIndent = 0
-      if (removeChecks.firstLineIndent) para.firstLineIndent = 0
-      if (removeChecks.spaceAfter)      para.spaceAfter = 0
-      if (removeChecks.spaceBefore)     para.spaceBefore = 0
-      if (removeChecks.alignment)       (para as any).alignment = 'left'
-      await context.sync()
-      setStatus({ type: 'success', message: '選択した書式を除去しました（Ctrl+Z で元に戻せます）' })
+      const styleNameForReset = para.style
+      const ops: [string, () => void | Promise<void>][] = []
+      const sync = () => context.sync()
+      if (removeChecks.bold)            ops.push(['太字',         async () => { (para.font as any).bold = null; await sync() }])
+      if (removeChecks.italic)          ops.push(['斜体',         async () => { (para.font as any).italic = null; await sync() }])
+      if (removeChecks.underline)       ops.push(['下線',         async () => { (para.font as any).underline = null; await sync() }])
+      if (removeChecks.fontColor)       ops.push(['文字色',       async () => { para.font.color = '#000000'; await sync() }])
+      if (removeChecks.lineSpacing)     ops.push(['行間',         async () => { (para as any).lineSpacing = null; (para as any).lineSpacingRule = null; await sync() }])
+      // インデント除去: numPr が存在する場合は OOXML から <w:ind> 属性を除去し段落を置換
+      const removeIndentViaOoxml = async (attrs: string[]) => {
+        const ooxmlResult = para.getOoxml()
+        await sync()
+        const xml = ooxmlResult.value
+        if (xml.includes('<w:numPr') && xml.includes('<w:ind')) {
+          let modified = xml
+          for (const attr of attrs) {
+            modified = modified.replace(
+              new RegExp(`${attr}(?:Chars)?="[^"]*"\\s*`, 'g'), ''
+            )
+          }
+          // Range.insertOoxml('Replace') で段落を置換
+          const range = para.getRange()
+          range.insertOoxml(modified, 'Replace')
+        } else {
+          para.leftIndent = 0
+        }
+        await sync()
+      }
+      if (removeChecks.leftIndent)      ops.push(['左インデント', () => removeIndentViaOoxml(['w:left'])])
+      if (removeChecks.rightIndent)     ops.push(['右インデント', () => removeIndentViaOoxml(['w:right'])])
+      if (removeChecks.firstLineIndent) ops.push(['字下げ',       () => removeIndentViaOoxml(['w:firstLine', 'w:hanging'])])
+      if (removeChecks.spaceAfter)      ops.push(['段落後の間隔', async () => { para.spaceAfter = 0; await sync() }])
+      if (removeChecks.spaceBefore)     ops.push(['段落前の間隔', async () => { para.spaceBefore = 0; await sync() }])
+      if (removeChecks.alignment)       ops.push(['文字配置',     async () => { (para as any).alignment = null; await sync() }])
+
+      const failed: string[] = []
+      for (const [label, fn] of ops) {
+        try {
+          await fn()
+        } catch (e) {
+          failed.push(`${label}（${e instanceof Error ? e.message : String(e)}）`)
+        }
+      }
+
+      if (failed.length > 0) {
+        setStatus({ type: 'warning', message: `除去できなかった項目：${failed.join('、')}` })
+      } else {
+        setStatus({ type: 'success', message: '選択した書式を除去しました（Ctrl+Z で元に戻せます）' })
+      }
     })
   }
 
@@ -283,9 +339,9 @@ export function StyleManagementFeature() {
   return (
     <div className={styles.root}>
       {/* ── Step1: スキャン ── */}
-      <SectionHeader title="ステップ 1：文書スキャン" />
+      <SectionHeader title="ステップ 1：文書スキャン" helpText="文書全体を解析し、各段落に設定された「スタイル」（見出し・本文など文字の見た目のテンプレート）と、スタイルを無視して直接付けられた書式（太字・色など）を一覧表示します。まずここから始めてください。🟢 正常・🟡 上書きあり・🔴 未設定 の色分けで状態がわかります。" />
       <Button appearance="secondary" className={styles.btnFull} onClick={handleScan}>
-        文書をスキャンして書式状況を確認
+        再取得
       </Button>
 
       {/* スタイル未設定警告 */}
@@ -341,53 +397,54 @@ export function StyleManagementFeature() {
             ))}
           </div>
           <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif" }}>
-            🟢 正常: {paragraphs.filter(p => p.status === 'clean').length}　
-            🟡 上書きあり: {paragraphs.filter(p => p.status === 'overridden').length}　
+            🟢 正常: {paragraphs.filter(p => p.status === 'clean').length}
+            🟡 上書きあり: {paragraphs.filter(p => p.status === 'overridden').length}
             🔴 未設定: {paragraphs.filter(p => p.status === 'unstyled').length}
+          </Text>
+          <Text size={200} style={{ color: '#6b7280', fontFamily: "'Yu Gothic','Meiryo',sans-serif" }}>
+            ※ 段落を選択してください
           </Text>
         </>
       )}
 
       {/* ── Step2: 詳細確認 ── */}
-      {step >= 2 && selectedPara && (
+      {paragraphs.length > 0 && (
         <>
-          <SectionHeader title="ステップ 2：詳細確認" />
+          <SectionHeader title="ステップ 2：詳細確認" helpText="上の一覧から段落を選ぶと、その段落に直接付けられている書式（スタイルの定義を上書きしている書式）の詳細がここに表示されます。太字・斜体・文字色・行間・インデントなど、除去できる項目を確認できます。意図した強調表現が含まれている場合は、ステップ 3 で個別に選んで除去してください。" />
+        <div style={{ opacity: selectedPara ? 1 : 0.4, pointerEvents: selectedPara ? 'auto' : 'none' }}>
           <div className={styles.detailBox}>
-            {`【第${selectedPara.index + 1}段落】スタイル：${selectedPara.styleName}\n`}
-            {Object.keys(selectedPara.overrides).length === 0
-              ? '直接上書き書式は検出されませんでした。'
-              : [
-                  selectedPara.overrides.bold       && '  ・太字：スタイル定義外で ON',
-                  selectedPara.overrides.italic     && '  ・斜体：スタイル定義外で ON',
-                  selectedPara.overrides.underline  && '  ・下線：スタイル定義外で設定',
-                  selectedPara.overrides.fontColor  && '  ・文字色：直接指定あり',
-                  selectedPara.overrides.lineSpacing && '  ・行間：直接指定あり',
-                  selectedPara.overrides.leftIndent  && '  ・左インデント：直接指定あり',
-                  selectedPara.overrides.rightIndent && '  ・右インデント：直接指定あり',
-                  selectedPara.overrides.firstLineIndent && '  ・字下げ：直接指定あり',
-                  selectedPara.overrides.spaceAfter  && '  ・段落後の間隔：直接指定あり',
-                  selectedPara.overrides.spaceBefore && '  ・段落前の間隔：直接指定あり',
-                  selectedPara.overrides.alignment   && '  ・文字配置：直接指定あり',
-                ].filter(Boolean).join('\n')
+            {selectedPara
+              ? `【第${selectedPara.index + 1}段落】スタイル：${selectedPara.styleName}\n` +
+                (Object.keys(selectedPara.overrides).length === 0
+                  ? '直接上書き書式は検出されませんでした。'
+                  : [
+                      selectedPara.overrides.bold       && '  ・太字：スタイル定義外で ON',
+                      selectedPara.overrides.italic     && '  ・斜体：スタイル定義外で ON',
+                      selectedPara.overrides.underline  && '  ・下線：スタイル定義外で設定',
+                      selectedPara.overrides.fontColor  && '  ・文字色：直接指定あり',
+                      selectedPara.overrides.lineSpacing && '  ・行間：直接指定あり',
+                      selectedPara.overrides.leftIndent  && '  ・左インデント：直接指定あり',
+                      selectedPara.overrides.rightIndent && '  ・右インデント：直接指定あり',
+                      selectedPara.overrides.firstLineIndent && '  ・字下げ：直接指定あり',
+                      selectedPara.overrides.spaceAfter  && '  ・段落後の間隔：直接指定あり',
+                      selectedPara.overrides.spaceBefore && '  ・段落前の間隔：直接指定あり',
+                      selectedPara.overrides.alignment   && '  ・文字配置：直接指定あり',
+                    ].filter(Boolean).join('\n'))
+              : '（段落を選択すると詳細が表示されます）'
             }
           </div>
           <Text size={100} style={{ color: '#b45309', fontFamily: "'Yu Gothic','Meiryo',sans-serif" }}>
             ⚠️ 直接上書きには意図した強調表現も含まれる場合があります
           </Text>
-          <Button
-            appearance="secondary"
-            className={styles.btnFull}
-            onClick={() => setStep(3)}
-          >
-            正規化オプションへ →
-          </Button>
+        </div>
         </>
       )}
 
       {/* ── Step3: 選択的正規化 ── */}
-      {step >= 3 && selectedPara && (
+      {paragraphs.length > 0 && (
         <>
-          <SectionHeader title="ステップ 3：選択的正規化" />
+          <SectionHeader title="ステップ 3：選択的正規化" helpText="目次内のテキストにはスタイルの除去が正常に機能しない場合があります。&#10;&#10;除去したい書式（太字・文字色・行間など）にチェックを入れて「選択中の段落に適用」を押すと、その書式だけを取り除きます。意図的な強調表現は残したい場合、チェックを外してから適用してください。操作は Ctrl+Z でいつでも元に戻せます。" />
+        <div style={{ opacity: selectedPara ? 1 : 0.4, pointerEvents: selectedPara ? 'auto' : 'none' }}>
           <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif" }}>
             除去する書式を選択してください（Ctrl+Z で元に戻せます）
           </Text>
@@ -438,34 +495,7 @@ export function StyleManagementFeature() {
             選択した項目を除去する
           </Button>
 
-          {/* 全て除去（確認ダイアログ付き） */}
-          <Dialog>
-            <DialogTrigger disableButtonEnhancement>
-              <Button appearance="secondary" className={styles.btnDanger}>
-                すべて除去してスタイルに戻す ⚠️
-              </Button>
-            </DialogTrigger>
-            <DialogSurface>
-              <DialogBody>
-                <DialogTitle>全て除去してよいですか？</DialogTitle>
-                <DialogContent>
-                  文書全段落の直接上書き書式をすべて除去します。
-                  意図した強調表現も失われる可能性があります。
-                  Ctrl+Z で元に戻すことができます。
-                </DialogContent>
-                <DialogActions>
-                  <DialogTrigger disableButtonEnhancement>
-                    <Button appearance="secondary">キャンセル</Button>
-                  </DialogTrigger>
-                  <DialogTrigger disableButtonEnhancement>
-                    <Button appearance="primary" onClick={handleResetAll}>
-                      除去する
-                    </Button>
-                  </DialogTrigger>
-                </DialogActions>
-              </DialogBody>
-            </DialogSurface>
-          </Dialog>
+        </div>
         </>
       )}
 

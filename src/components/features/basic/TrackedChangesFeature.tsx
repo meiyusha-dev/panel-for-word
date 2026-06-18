@@ -178,7 +178,7 @@ export function TrackedChangesFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="変更履歴管理" />
+      <SectionHeader title="変更履歴管理" helpText="文書への変更内容（文字の追加・削除・書式変更）を記録・表示できます。誰がいつどこを変更したかが色付きで残るため、複数人での校正や上司へのレビュー依頼に役立ちます。変更を「承認」すると確定し、「却下」すると元に戻ります。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         文書内の変更履歴を一括で承認・却下します。
         デスクトップ版 Word 専用の機能です。

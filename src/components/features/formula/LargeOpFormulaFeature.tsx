@@ -383,19 +383,19 @@ export function LargeOpFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="総和" />
+      <SectionHeader title="総和" helpText="Σ（シグマ）記号を使った合計の数式を挿入します。「i=1 から n まで足し合わせる」のような総和（合計）を表現するときに使います。" />
       {renderGrid5(SUM_ITEMS)}
 
-      <SectionHeader title="直積と直和" />
+      <SectionHeader title="直積と直和" helpText="数学の直積（∏、複数の要素を掛け合わせる操作）と直和（⊕、集合や空間を組み合わせる操作）の記号を挿入します。" />
       {renderGrid5([...PROD_ITEMS, ...COPROD_ITEMS])}
 
-      <SectionHeader title="和集合と積集合" />
+      <SectionHeader title="和集合と積集合" helpText="集合の和（∪、どちらかに含まれる要素の集まり）・積（∩、両方に含まれる要素の集まり）を表す記号を挿入します。" />
       {renderGrid5([...UNION_ITEMS, ...INTER_ITEMS])}
 
-      <SectionHeader title="その他の大型演算子" />
+      <SectionHeader title="その他の大型演算子" helpText="論理和（∨）・論理積（∧）など、総和・直積・集合以外の大型演算記号を挿入します。" />
       {renderGrid5([...LOR_ITEMS, ...LAND_ITEMS])}
 
-      <SectionHeader title="よく使われる大型演算子" />
+      <SectionHeader title="よく使われる大型演算子" helpText="よく使われる大型演算子の形をプリセットから選んで素早く挿入できます。" />
       {renderGrid3(PRESET_ITEMS)}
 
       {tooltip && createPortal(

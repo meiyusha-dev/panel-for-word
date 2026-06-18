@@ -125,7 +125,7 @@ export function TableFormatFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="表の整形" />
+      <SectionHeader title="表の整形" helpText="文書内の表のセルの幅・高さや文字の配置をまとめて整えます。手動で調整するとバラバラになりがちな表のレイアウトを、指定したルールに従って一括できれいに揃えることができます。" />
 
       <Text size={100} className={styles.sectionLabel}>一括（文書内の全ての表）</Text>
       <Button appearance="secondary" className={styles.btnFull} onClick={handleEqualWidth}>

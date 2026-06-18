@@ -312,7 +312,7 @@ export function FontReplaceFeature() {
       </Button>
 
       {/* テキスト検索・置換 */}
-      <SectionHeader title="テキスト検索・置換" />
+      <SectionHeader title="テキスト検索・置換" helpText="特定の文字・単語を文書全体から検索し、別の内容に一括置換します。書式（フォント・色・太字など）の検索・置換にも対応しています。例：「ABC社」を「XYZ株式会社」に全件置換、文書内の赤文字をすべて黒に戻すなど。" />
       <Field label="検索テキスト">
         <Input
           className={styles.input}

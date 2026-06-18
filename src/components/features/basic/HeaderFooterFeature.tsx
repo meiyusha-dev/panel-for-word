@@ -577,7 +577,7 @@ export function HeaderFooterFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="ヘッダー/フッター設定" />
+      <SectionHeader title="ヘッダー/フッター設定" helpText="各ページの上端（ヘッダー）・下端（フッター）に表示するテキストを設定します。文書タイトルや会社名など、全ページに共通して表示したい情報を一度に設定できます。先頭ページのみ別の内容にしたり、奇数・偶数ページで内容を変えることもできます。" />
 
       {/* タブ切り替え */}
       <div className={styles.tabBar}>
@@ -609,7 +609,7 @@ export function HeaderFooterFeature() {
 
       {/* 入力パネル */}
       <div className={styles.panel}>
-        <SectionHeader title={`ヘッダー（${displayTabLabel}）`} />
+        <SectionHeader title={`ヘッダー（${displayTabLabel}）`} helpText="ページ上端に表示するテキストを入力し、左・中央・右の配置を選んで適用します。" />
         <div className={styles.fieldRow}>
           <Label size="small">ヘッダーテキスト</Label>
           <Input
@@ -632,7 +632,7 @@ export function HeaderFooterFeature() {
           </div>
         </div>
 
-        <SectionHeader title={`フッター（${displayTabLabel}）`} />
+        <SectionHeader title={`フッター（${displayTabLabel}）`} helpText="ページ下端に表示するテキストを入力し、左・中央・右の配置を選んで適用します。" />
         <div className={styles.fieldRow}>
           <Label size="small">フッターテキスト</Label>
           <Input
@@ -664,7 +664,7 @@ export function HeaderFooterFeature() {
         設定を適用
       </Button>
 
-      <SectionHeader title="ページ番号" />
+      <SectionHeader title="ページ番号" helpText="ヘッダーまたはフッターにページ番号を自動挿入します。番号の開始値（例：「3」から始める）や配置（左・中央・右）を指定できます。ページを追加・削除しても番号は自動で振り直されます。" />
       <div className={styles.pageNumBox}>
         <div className={styles.fieldRow}>
           <Label size="small">挿入先（現在のタブに適用）</Label>

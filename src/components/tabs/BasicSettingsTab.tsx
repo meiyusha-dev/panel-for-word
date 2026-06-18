@@ -233,7 +233,7 @@ export function BasicSettingsTab() {
     <div className={styles.root}>
 
       <div className={styles.section}>
-        <SectionHeader title="ページ設定確認" />
+        <SectionHeader title="ページ設定確認" helpText="サンプル" />
         <Button appearance="secondary" className={styles.btnFull} onClick={getDocSettings}>
           現在のドキュメントの設定値
         </Button>
@@ -245,7 +245,7 @@ export function BasicSettingsTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="用紙サイズ" />
+        <SectionHeader title="用紙サイズ" helpText="サンプル" />
         <div className={styles.row}>
           <Field label="用紙サイズ">
             <Select value={paperSize} onChange={(_, d) => setPaperSize(d.value)}>
@@ -261,7 +261,7 @@ export function BasicSettingsTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="基本文字サイズ" />
+        <SectionHeader title="基本文字サイズ" helpText="サンプル" />
         <Field label="文字サイズ (pt)">
           <SpinButton
             value={fontSize}
@@ -277,7 +277,7 @@ export function BasicSettingsTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="ページ余白（ミリ）" />
+        <SectionHeader title="ページ余白（ミリ）" helpText="サンプル" />
         <div className={styles.marginGrid}>
           <Field label="①上（天）" className={styles.marginField}>
             <Input
@@ -318,7 +318,7 @@ export function BasicSettingsTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="段組み" />
+        <SectionHeader title="段組み" helpText="サンプル" />
         <div className={styles.marginGrid}>
           <Field label="段数">
             <SpinButton
@@ -346,39 +346,39 @@ export function BasicSettingsTab() {
 
       {/* --- 基本機能カード --- */}
       <div className={styles.section}>
-        <SectionHeader title="コメント管理" />
+        <SectionHeader title="コメント管理" helpText="サンプル" />
         <CommentsFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="図表番号・相互参照" />
+        <SectionHeader title="図表番号・相互参照" helpText="サンプル" />
         <FigureCaptionFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="脚注・文末脚注" />
+        <SectionHeader title="脚注・文末脚注" helpText="サンプル" />
         <FootnoteFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="ヘッダー/フッター設定" />
+        <SectionHeader title="ヘッダー/フッター設定" helpText="サンプル" />
         <HeaderFooterFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="改ページ制御" />
+        <SectionHeader title="改ページ制御" helpText="サンプル" />
         <PageBreakFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="スタイル管理" />
+        <SectionHeader title="スタイル管理" helpText="サンプル" />
         <StyleManagementFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="表の整形" />
+        <SectionHeader title="表の整形" helpText="サンプル" />
         <TableFormatFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="目次・フィールド更新" />
+        <SectionHeader title="目次・フィールド更新" helpText="サンプル" />
         <TocUpdateFeature />
       </div>
       <div className={styles.section}>
-        <SectionHeader title="変更履歴管理" />
+        <SectionHeader title="変更履歴管理" helpText="サンプル" />
         <TrackedChangesFeature />
       </div>
 

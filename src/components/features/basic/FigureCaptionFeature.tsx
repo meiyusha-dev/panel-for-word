@@ -200,7 +200,7 @@ export function FigureCaptionFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="図表番号・相互参照" />
+      <SectionHeader title="図表番号・相互参照" helpText="図や表に「図 1」「表 2」のような番号付きラベル（キャプション）を自動で挿入します。図を追加・削除すると番号が自動で振り直されます。また「図 1 を参照」のように本文から図表へのリンク（相互参照）も作成でき、ページ番号が変わっても自動で更新されます。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         SEQ（図表番号）・REF（相互参照）・STYLEREF フィールドを一括更新します。
         本文・ヘッダー・フッター内のフィールドが対象です。

@@ -105,7 +105,7 @@ export function PageBreakFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="改ページの制御" />
+      <SectionHeader title="改ページの制御" helpText="特定の場所で強制的に次のページに移ったり、段落・表が途中でページをまたがないよう制御します。「章の始めは必ず新しいページから」「見出しと本文は同じページに収める」といった体裁を整えるときに使います。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         選択した段落に改ページ設定を適用します。
       </Text>

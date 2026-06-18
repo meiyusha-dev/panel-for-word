@@ -241,7 +241,7 @@ export function FuncFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="関数" />
+      <SectionHeader title="関数" helpText="lim（極限）・log（対数）・ln（自然対数）・max（最大値）・min（最小値）など、数学的な関数の記号を挿入します。これらは通常のテキストとは区別されるよう、数式内では専用の書式で表示されます。" />
       <div className={styles.grid3}>
         {FUNC_ITEMS.map((item) => (
           <button
@@ -256,7 +256,7 @@ export function FuncFormulaFeature() {
         ))}
       </div>
 
-      <SectionHeader title="よく使われる関数" />
+      <SectionHeader title="よく使われる関数" helpText="よく使われる関数のプリセット（引数の枠付き）から選んで素早く挿入できます。" />
       <div className={styles.grid2}>
         {PRESET_ITEMS.map((item) => (
           <button

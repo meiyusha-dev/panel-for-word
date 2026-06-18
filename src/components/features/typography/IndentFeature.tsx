@@ -53,7 +53,7 @@ export function IndentFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="インデント" />
+      <SectionHeader title="インデント" helpText="段落の左右の字下げ幅と、段落最初の行だけの字下げ（字下げ／ぶら下がり）を設定します。箇条書きの階層を整えたり、引用文を左にずらして本文と区別したりするときに使います。" />
       <div className={styles.grid}>
         <Field label="左 (字)">
           <SpinButton value={indentLeft} min={0} max={30} step={0.5} onChange={(_, d) => setIndentLeft(d.value ?? 0)} />

@@ -292,19 +292,19 @@ export function TrigFuncFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="三角関数" />
+      <SectionHeader title="三角関数" helpText="sin・cos・tan など基本的な三角関数の記号を挿入します。三角関数とは角度と辺の長さの比を表す関数で、物理・工学・建築などで広く使われます。" />
       {renderGrid6(TRIG_ITEMS, TRIG_XML)}
 
-      <SectionHeader title="逆関数" />
+      <SectionHeader title="逆関数" helpText="arcsin・arccos・arctan など逆三角関数の記号を挿入します。「この比率になる角度は何度か」を求めるときに使います。" />
       {renderGrid6(INV_ITEMS, INV_XML)}
 
-      <SectionHeader title="双曲線関数" />
+      <SectionHeader title="双曲線関数" helpText="sinh・cosh・tanh など双曲線関数の記号を挿入します。双曲線関数は自然現象（懸垂線・相対性理論など）の記述に使われる関数です。" />
       {renderGrid6(HYP_ITEMS, HYP_XML)}
 
-      <SectionHeader title="逆双曲線関数" />
+      <SectionHeader title="逆双曲線関数" helpText="arcsinh・arccosh・arctanh など逆双曲線関数の記号を挿入します。双曲線関数の逆演算で、工学・物理の計算に使われます。" />
       {renderGrid6(INV_HYP_ITEMS, INV_HYP_XML)}
 
-      <SectionHeader title="よく使われる三角関数" />
+      <SectionHeader title="よく使われる三角関数" helpText="よく使われる三角関数の組み合わせをプリセットから選んで素早く挿入できます。" />
       <div className={styles.grid3}>
         {PRESET_ITEMS.map((item) => (
           <button

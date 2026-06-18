@@ -126,7 +126,7 @@ export function ZOrderFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="重ね順" />
+      <SectionHeader title="重ね順" helpText="複数の図形やテキストボックスが重なっているとき、前後の順番（どれが手前に表示されるか）を変更します。「最前面」「最背面」に一度で移動するほか、1 段階ずつ前後に移動することもできます。" />
       <div className={styles.grid2x2}>
         <Button appearance="secondary" className={styles.btnFull} onClick={() => handleZOrder('top')}>
           最前面

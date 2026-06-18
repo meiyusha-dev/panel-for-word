@@ -44,7 +44,7 @@ export function LineSpacingFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="行間" />
+      <SectionHeader title="行間" helpText="行と行の間隔を調整します。「倍数」で指定すると文字サイズに合わせて比例して変わり、「固定値」でポイント単位の固定幅を設定できます。読みやすさの改善や、1 ページに収める行数を調整したいときに使います。" />
       <div className={styles.row}>
         <Button
           appearance={lineSpacingMode === 'multiple' ? 'primary' : 'secondary'}

@@ -272,22 +272,22 @@ export function AccentFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="アクセント" />
+      <SectionHeader title="アクセント" helpText="文字や数式の上にハット（â）・バー（ā）・ドット（ȧ）・ベクトル矢印（→）などの記号を付けます。物理のベクトル量や統計の平均値など、特別な意味を持つ記号の表記に使います。" />
       <div className={styles.grid4}>
         {renderCards(MAIN_ACCENTS)}
       </div>
 
-      <SectionHeader title="四角囲み数式" />
+      <SectionHeader title="四角囲み数式" helpText="数式や文字を四角い枠で囲みます。答えや重要な式を強調して目立たせたいときに使います。" />
       <div className={styles.gridBox}>
         {renderCards(BOX_ITEMS)}
       </div>
 
-      <SectionHeader title="オーバーラインとアンダーライン" />
+      <SectionHeader title="オーバーラインとアンダーライン" helpText="数式や文字の上（オーバーライン）または下（アンダーライン）に横線を引きます。平均値の表記（x̄）や補集合（Ā）などに使います。" />
       <div className={styles.grid3}>
         {renderCards(BARLINE_ITEMS)}
       </div>
 
-      <SectionHeader title="よく使われるアクセントオブジェクト" />
+      <SectionHeader title="よく使われるアクセントオブジェクト" helpText="よく使われるアクセント記号の組み合わせをプリセットから選んで素早く挿入できます。" />
       <div className={styles.grid3}>
         {renderCards(COMMON_ITEMS)}
       </div>

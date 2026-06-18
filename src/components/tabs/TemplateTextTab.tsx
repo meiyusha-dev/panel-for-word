@@ -241,7 +241,7 @@ export function TemplateTextTab() {
 
       {/* ── 定型文入力 ── */}
       <div className={styles.section}>
-        <SectionHeader title="定型文入力" />
+        <SectionHeader title="定型文入力" helpText="サンプル" />
         <RadioGroup
           value={selectedTemplate}
           onChange={(_, d) => setSelectedTemplate(d.value)}
@@ -286,7 +286,7 @@ export function TemplateTextTab() {
 
       {/* ── 記号入力 ── */}
       <div className={styles.section}>
-        <SectionHeader title="記号入力（丸付き数字など）" />
+        <SectionHeader title="記号入力（丸付き数字など）" helpText="サンプル" />
         <div className={styles.symbolSlots}>
           {slotSeriesIndices.map((seriesIdx, i) => (
             <Button

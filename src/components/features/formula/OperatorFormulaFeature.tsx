@@ -253,7 +253,7 @@ export function OperatorFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="基本演算子" />
+      <SectionHeader title="基本演算子" helpText="±（プラスマイナス）・×・÷・≠（等しくない）・≤（以下）・≥（以上）など、基本的な数学記号を挿入します。キーボードで入力できない記号を正確に入力できます。" />
       <div className={styles.grid}>
         {OPERATOR_ITEMS.map((item) => (
           <button
@@ -268,7 +268,7 @@ export function OperatorFormulaFeature() {
         ))}
       </div>
 
-      <SectionHeader title="演算子構造" />
+      <SectionHeader title="演算子構造" helpText="演算子の下に範囲を付けるなど、演算子を含む複雑な数式構造を挿入します。例：「x → 0 のとき」のような極限表記の演算子部分などに使います。" />
       <div className={styles.grid}>
         {OP_STRUCT_ITEMS.map((item) => (
           <button
@@ -283,7 +283,7 @@ export function OperatorFormulaFeature() {
         ))}
       </div>
 
-      <SectionHeader title="よく使われる演算子構造" />
+      <SectionHeader title="よく使われる演算子構造" helpText="よく使われる演算子構造のプリセットから選んで素早く挿入できます。" />
       <div className={styles.grid2}>
         {OP_PRESET_ITEMS.map((item) => (
           <button

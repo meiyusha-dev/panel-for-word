@@ -233,7 +233,7 @@ export function ScriptFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="上付き/下付き文字" />
+      <SectionHeader title="上付き/下付き文字" helpText="数式の中に上付き文字（x² の「2」など、指数や乗数）や下付き文字（H₂O の「2」など、添字）を挿入します。上下両方に付ける形式も選べます。" />
 
       <div className={styles.grid}>
         {SCRIPT_ITEMS.map((item) => (

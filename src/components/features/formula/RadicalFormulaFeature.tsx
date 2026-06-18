@@ -234,7 +234,7 @@ export function RadicalFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="べき乗根" />
+      <SectionHeader title="べき乗根" helpText="平方根（√）・立方根（∛）など、根号（ルート記号）を数式に挿入します。根号の中に任意の数式を入れることができます。べき乗根とは「何乗すれば元の数になるか」を表す記号です。" />
       <div className={styles.grid4}>
         {RADICAL_ITEMS.map((item) => (
           <button
@@ -249,7 +249,7 @@ export function RadicalFormulaFeature() {
         ))}
       </div>
 
-      <SectionHeader title="よく使われるべき乗根" />
+      <SectionHeader title="よく使われるべき乗根" helpText="よく使われる根号の形（√a、∛a など）をプリセットから選んで素早く挿入できます。" />
       <div className={styles.grid2}>
         {PRESET_RADICALS.map((item) => (
           <button

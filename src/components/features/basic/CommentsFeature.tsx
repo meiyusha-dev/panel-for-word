@@ -180,7 +180,7 @@ export function CommentsFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="コメント管理" />
+      <SectionHeader title="コメント管理" helpText="文書内の「コメント」（付箋のようなメモ書き）を一覧表示し、追加・解決・削除ができます。複数人で文書を確認・校正するときや、自分用のメモを残したいときに使います。コメントは印刷には出力されません。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         文書内のコメントを確認・追加・一括解決・削除します。
       </Text>

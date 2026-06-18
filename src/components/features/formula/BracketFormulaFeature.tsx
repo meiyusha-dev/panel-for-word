@@ -364,22 +364,22 @@ export function BracketFormulaFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="かっこ" />
+      <SectionHeader title="かっこ" helpText="数式の大きさに合わせて自動的に伸縮するかっこを挿入します。小かっこ ( )・中かっこ { }・大かっこ [ ] など、対になるかっこの組み合わせを選べます。" />
       {grid4(PAIRED_ITEMS)}
       {grid4(PAIRED_MIXED_ITEMS)}
 
-      <SectionHeader title="かっこと縦棒" />
+      <SectionHeader title="かっこと縦棒" helpText="かっこと縦棒（|）を組み合わせた構造を挿入します。絶対値 |x| や内積 〈a|b〉のような表記に使います。" />
       {grid4(SEP_ITEMS)}
 
-      <SectionHeader title="単一かっこ" />
+      <SectionHeader title="単一かっこ" helpText="左側だけ・右側だけの片方のかっこを挿入します。開区間や半開区間（例：[a, b)）の表記などに使います。" />
       {grid4(SINGLE_ITEMS_1)}
       {grid4(SINGLE_ITEMS_2)}
       {grid4(SINGLE_ITEMS_3)}
 
-      <SectionHeader title="場合分けと積み重ね" />
+      <SectionHeader title="場合分けと積み重ね" helpText="「x > 0 のとき … そうでないとき …」のような条件による場合分け構造や、数式を縦に積み重ねる形式を挿入します。{ 記号と複数行の数式が組み合わさった表記です。" />
       {grid4(CASES_ITEMS)}
 
-      <SectionHeader title="よく使われるかっこ" />
+      <SectionHeader title="よく使われるかっこ" helpText="よく使われるかっこ構造をプリセットから選んで素早く挿入できます。" />
       {grid3(COMMON_ITEMS)}
 
       {tooltip && createPortal(

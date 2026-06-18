@@ -295,7 +295,7 @@ export function ShapeInsertFeature() {
   return (
     <div className={styles.root}>
 
-      <SectionHeader title="サイズ指定" />
+      <SectionHeader title="サイズ指定" helpText="選択した図形やテキストボックスの幅・高さを数値で正確に指定します。「字・行」で文字数・行数ベースの指定と、「mm」でミリメートル単位の指定が選べます。ドラッグで大まかに調整するよりも正確なサイズに揃えたいときに使います。" />
       <div className={styles.segRow}>
         <button
           className={sizeMode === 'char' ? styles.segBtnActive : styles.segBtn}
@@ -332,7 +332,7 @@ export function ShapeInsertFeature() {
         </div>
       </div>
 
-      <SectionHeader title="図形の種類" />
+      <SectionHeader title="図形の種類" helpText="選択中の図形の形（四角・角丸四角・円・矢印など）を変更します。図形の内容（テキストや塗りつぶし）はそのままで、形だけを差し替えることができます。" />
       <div className={styles.typeRow}>
         <button
           className={shapeType === 'textbox' ? styles.typeBtnActive : styles.typeBtn}

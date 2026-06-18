@@ -254,7 +254,7 @@ export function CharCompositionTab() {
     <div className={styles.root}>
 
       <div className={styles.section}>
-        <SectionHeader title="インデント" />
+        <SectionHeader title="インデント" helpText="サンプル" />
         <div className={styles.indentGrid}>
           <Field label="左 (字)">
             <SpinButton
@@ -293,7 +293,7 @@ export function CharCompositionTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="行間" />
+        <SectionHeader title="行間" helpText="サンプル" />
         <div className={styles.lineSpacingRow}>
           <Button
             appearance={lineSpacingMode === 'multiple' ? 'primary' : 'secondary'}
@@ -334,7 +334,7 @@ export function CharCompositionTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="表" />
+        <SectionHeader title="表" helpText="サンプル" />
         <div className={styles.row}>
           <Field label="行数">
             <SpinButton
@@ -361,7 +361,7 @@ export function CharCompositionTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="ドキュメント使用フォント一覧・置換" />
+        <SectionHeader title="ドキュメント使用フォント一覧・置換" helpText="サンプル" />
         <div className={styles.fontListRow}>
           <div className={styles.fontList}>
             {fontList.map((f) => (

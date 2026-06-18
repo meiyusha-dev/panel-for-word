@@ -168,7 +168,7 @@ export function TocUpdateFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="目次・フィールド更新" />
+      <SectionHeader title="目次・フィールド更新" helpText="文書の目次を最新の内容に更新します。見出しを追加・変更・削除した後や、ページが変わった後は目次が古いままになるため、このボタンで最新の状態に揃えます。ページ番号など自動で入力される項目（フィールド）もまとめて再計算できます。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         文書内の目次やフィールドを最新の状態に更新します。
         デスクトップ版 Word が必要です。

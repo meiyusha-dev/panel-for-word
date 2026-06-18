@@ -562,7 +562,7 @@ export function FormulaTab() {
     <div className={styles.root}>
 
       <div className={styles.section}>
-        <SectionHeader title="分数挿入" />
+        <SectionHeader title="分数挿入" helpText="サンプル" />
         <Field label="分数タイプ">
           <Select
             value={fracType}
@@ -579,7 +579,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="上付き・下付き文字挿入" />
+        <SectionHeader title="上付き・下付き文字挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={scriptType}
@@ -596,7 +596,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="べき乗根挿入" />
+        <SectionHeader title="べき乗根挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={radicalType}
@@ -613,7 +613,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="積分挿入" />
+        <SectionHeader title="積分挿入" helpText="サンプル" />
         <Field label="積分タイプ">
           <Select
             value={integralType}
@@ -630,7 +630,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="大型演算子挿入" />
+        <SectionHeader title="大型演算子挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={largeOpType}
@@ -647,7 +647,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="かっこ挿入" />
+        <SectionHeader title="かっこ挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={bracketType}
@@ -664,7 +664,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="関数挿入" />
+        <SectionHeader title="関数挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={trigFuncType}
@@ -681,7 +681,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="アクセント・ベクトル挿入" />
+        <SectionHeader title="アクセント・ベクトル挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={accentType}
@@ -698,12 +698,12 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="極限・対数挿入" />
+        <SectionHeader title="極限・対数挿入" helpText="サンプル" />
         <Text size={200}>※後日設定</Text>
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="演算子挿入" />
+        <SectionHeader title="演算子挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={operatorType}
@@ -720,7 +720,7 @@ export function FormulaTab() {
       </div>
 
       <div className={styles.section}>
-        <SectionHeader title="行列挿入" />
+        <SectionHeader title="行列挿入" helpText="サンプル" />
         <Field label="種類">
           <Select
             value={matrixType}

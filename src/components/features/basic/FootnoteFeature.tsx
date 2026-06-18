@@ -72,7 +72,7 @@ export function FootnoteFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="脚注・文末脚注" />
+      <SectionHeader title="脚注・文末脚注" helpText="本文の補足説明を、ページ下部（脚注）または文書の末尾（文末脚注）に追加します。本文中に番号が表示され、対応する説明が自動で配置されます。学術論文・報告書・契約書などで出典や注釈を記載するときによく使われます。" />
       <Text size={100} style={{ color: '#4a7cb5', fontFamily: "'Yu Gothic','Meiryo',sans-serif", lineHeight: '1.6' }}>
         文書内の脚注・文末脚注の件数確認と一覧表示を行います。
       </Text>

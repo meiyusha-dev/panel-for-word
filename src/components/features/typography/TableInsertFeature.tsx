@@ -26,7 +26,7 @@ export function TableInsertFeature() {
 
   return (
     <div className={styles.root}>
-      <SectionHeader title="表" />
+      <SectionHeader title="表" helpText="指定した行数・列数の表をカーソル位置に挿入します。行・列の数は後から追加・削除できます。" />
       <div className={styles.row}>
         <Field label="行数">
           <SpinButton value={tableRows} min={1} max={50} step={1} onChange={(_, d) => setTableRows(d.value ?? 3)} />

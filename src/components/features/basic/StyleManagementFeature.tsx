@@ -143,7 +143,6 @@ export function StyleManagementFeature() {
   const [paragraphs, setParagraphs] = useState<ParagraphAnalysis[]>([])
   const [selected, setSelected] = useState<number | null>(null)
   const [showUnstyled, setShowUnstyled] = useState(false)
-  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [removeChecks, setRemoveChecks] = useState<OverrideFlags>({
     fontColor: false, bold: false, italic: false, underline: false,
     lineSpacing: false, leftIndent: false, rightIndent: false, firstLineIndent: false,
@@ -170,7 +169,7 @@ export function StyleManagementFeature() {
       const styleIndentMap: Record<string, { left: number; right: number; firstLine: number }> = {}
       for (const name of styleNames) {
         try {
-          const style = context.document.getStyleByNameOrNullObject(name)
+          const style = (context.document as any).getStyleByNameOrNullObject(name)
           style.paragraphFormat.load('leftIndent,rightIndent,firstLineIndent')
           await context.sync()
           if (!style.isNullObject) {
@@ -231,7 +230,6 @@ export function StyleManagementFeature() {
       setParagraphs(result)
       setSelected(null)
       setShowUnstyled(hasUnstyledHeading)
-      setStep(1)
       setStatus(null)
     })
 
@@ -246,7 +244,6 @@ export function StyleManagementFeature() {
       paras.load('items,style')
       await context.sync()
       const para = paras.items[selected]
-      const styleNameForReset = para.style
       const ops: [string, () => void | Promise<void>][] = []
       const sync = () => context.sync()
       if (removeChecks.bold)            ops.push(['太字',         async () => { (para.font as any).bold = null; await sync() }])
@@ -298,34 +295,6 @@ export function StyleManagementFeature() {
     })
   }
 
-  // 全段落の直接上書きをリセット（font.reset() + null代入フォールバック）
-  const handleResetAll = () =>
-    runWord(async (context) => {
-      const paras = context.document.body.paragraphs
-      paras.load('items')
-      await context.sync()
-      for (const para of paras.items) {
-        try {
-          para.font.reset()
-        } catch {
-          // reset() 非対応環境のフォールバック
-          ;(para.font as any).bold = false
-          ;(para.font as any).italic = false
-          ;(para.font as any).underline = 'none'
-          para.font.color = '#000000'
-        }
-        ;(para as any).lineSpacingRule = 'auto'
-        para.leftIndent = 0
-        para.rightIndent = 0
-        para.firstLineIndent = 0
-        para.spaceAfter = 0
-        para.spaceBefore = 0
-        ;(para as any).alignment = 'left'
-      }
-      await context.sync()
-      setStatus({ type: 'success', message: '全段落の直接上書き書式を除去しました（Ctrl+Z で元に戻せます）' })
-    })
-
   // ────────────────────────────────────────────────────────────────────
   // レンダリング
   // ────────────────────────────────────────────────────────────────────
@@ -370,7 +339,6 @@ export function StyleManagementFeature() {
                 }}
                 onClick={() => {
                   setSelected(p.index)
-                  setStep(2)
                   setRemoveChecks({
                     fontColor: !!p.overrides.fontColor,
                     bold: !!p.overrides.bold,
@@ -387,7 +355,7 @@ export function StyleManagementFeature() {
                 }}
                 role="button"
                 tabIndex={0}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { setSelected(p.index); setStep(2) } }}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { setSelected(p.index) } }}
               >
                 <span className={styles.dot} style={{ backgroundColor: statusColor(p.status) }} />
                 <Text size={100} style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

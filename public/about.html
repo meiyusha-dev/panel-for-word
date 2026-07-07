@@ -4,14 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>機能詳細 — かんたんツールパネル for Word</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/icon-32.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      /* ── 新配色（ヘッダー/タブ/一覧/詳細） ── */
+      --c-primary:      #2657D9;
+      --c-primary-soft: #EDF1FC;
+      --c-ink:          #14161A;
+      --c-ink-70:       rgba(20,22,26,.72);
+      --c-ink-60:       rgba(20,22,26,.60);
+      --c-ink-55:       rgba(20,22,26,.55);
+      --c-ink-45:       rgba(20,22,26,.45);
+      --c-ink-40:       rgba(20,22,26,.40);
+      --c-ink-12:       rgba(20,22,26,.12);
+      --c-ink-10:       rgba(20,22,26,.10);
+      --c-ink-08:       rgba(20,22,26,.08);
+      --dark-bg:        #161A20;
+      --font-jp: 'Noto Sans JP', 'Yu Gothic UI', 'Meiryo', 'Hiragino Sans', sans-serif;
+
+      /* ── 実アドインの配色（装飾内のミニタスクペインのみで使用） ── */
+      --real-tabbar:      #1e4d8c;
+      --real-tab-inactive: #7fb5e8;
+      --real-tab-active-bg: #f5f9ff;
+      --real-tab-active-text: #0c51a0;
+      --real-border:  #c5dcf5;
+      --real-label:   #0c3370;
+    }
+
     body {
-      font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", sans-serif;
+      font-family: var(--font-jp);
       font-size: 14px;
-      color: #1a1a1a;
-      background: #f0f4fa;
+      color: var(--c-ink);
+      background: #fff;
       height: 100vh;
       overflow: hidden;
       display: flex;
@@ -19,263 +48,344 @@
     }
 
     /* ── ヘッダー ── */
-    header {
-      background: #0c51a0;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      height: 52px;
-      flex-shrink: 0;
-      gap: 16px;
-    }
-    .logo {
-      font-size: 15px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .logo-sub {
-      font-size: 11px;
-      opacity: 0.7;
-      font-weight: 400;
-    }
-    header nav {
-      display: flex;
-      gap: 4px;
-      margin-left: auto;
-    }
-    header nav a {
-      color: rgba(255,255,255,0.8);
-      text-decoration: none;
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 500;
-      transition: background 0.15s, color 0.15s;
-    }
-    header nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
-    header nav a.active {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-    }
-
-    /* ── メインレイアウト ── */
-    .layout {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      min-height: 0;
-    }
-
-    /* ── 左ペイン ── */
-    .left-pane {
-      width: 296px;
-      flex-shrink: 0;
-      background: #fff;
-      border-right: 1px solid #c5dcf5;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* タブバー */
-    .tab-bar {
-      display: flex;
-      background: #0c51a0;
-      flex-shrink: 0;
-      overflow-x: auto;
-    }
-    .tab-bar::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      flex: 1;
-      min-width: 40px;
-      padding: 10px 4px;
-      background: transparent;
-      border: none;
-      border-bottom: 3px solid transparent;
-      color: rgba(255,255,255,0.7);
-      font-size: 11.5px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .tab-btn:hover { color: #fff; }
-    .tab-btn.active { color: #fff; border-bottom-color: #fff; }
-
-    /* 左ペインコンテンツ */
-    .left-pane-content {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      min-height: 0;
-    }
-    .left-pane-content::-webkit-scrollbar { width: 6px; }
-    .left-pane-content::-webkit-scrollbar-thumb { background: #c5dcf5; border-radius: 3px; }
-
-    /* カードグリッド */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      padding: 12px;
-    }
-
-    .feature-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 72px;
-      border-radius: 6px;
-      cursor: pointer;
-      gap: 5px;
-      border: 1px solid #c5dcf5;
-      background: #fff;
-      transition: background 0.15s, transform 0.12s, box-shadow 0.12s;
-      padding: 6px 4px;
-      user-select: none;
-      outline: none;
-    }
-    .feature-card:hover {
-      background: #e8f0fb;
-      transform: scale(1.05);
-      box-shadow: 0 2px 8px rgba(30,77,140,0.15);
-    }
-    .feature-card:focus-visible {
-      outline: 2px solid #1e4d8c;
-      outline-offset: 2px;
-    }
-    .feature-card.active {
-      background: #0c51a0;
-      border-color: #0c51a0;
-      transform: none;
-      box-shadow: 0 2px 6px rgba(12,81,160,0.4);
-    }
-    .feature-card.active .card-icon { color: #fff; }
-    .feature-card.active .card-label { color: #fff; }
-
-    .card-icon {
-      color: #1e4d8c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 28px;
-      flex-shrink: 0;
-    }
-    .card-label {
-      font-size: 10.5px;
-      text-align: center;
-      color: #0c3370;
-      line-height: 1.2;
-      word-break: keep-all;
-    }
-
-    /* お気に入りタブ左ペイン */
-    .favorites-text {
-      padding: 16px 14px;
-      font-size: 13px;
-      line-height: 1.75;
-      color: #333;
-    }
-    .favorites-text h3 {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0c51a0;
-      margin-bottom: 10px;
-    }
-    .favorites-text p { margin-bottom: 8px; }
-    .favorites-text ul { padding-left: 1.4em; }
-    .favorites-text li { margin-bottom: 5px; }
-
-    /* ── 右ペイン ── */
-    .right-pane {
-      flex: 1;
-      overflow-y: auto;
-      min-height: 0;
-      padding: 28px 36px;
-      background: #f8fafd;
-    }
-    .right-pane::-webkit-scrollbar { width: 8px; }
-    .right-pane::-webkit-scrollbar-thumb { background: #c5dcf5; border-radius: 4px; }
-
-    .detail-header {
+    .app-header {
+      flex: none;
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid #c5dcf5;
-    }
-    .detail-icon {
-      width: 48px;
-      height: 48px;
+      padding: 0 32px;
+      height: 52px;
       background: #0c51a0;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+    }
+    .brand-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      object-fit: contain;
       flex-shrink: 0;
     }
-    .detail-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0c3370;
+    .brand-name {
+      font: 700 15px var(--font-jp);
+      color: #fff;
+      white-space: nowrap;
     }
-    .detail-desc {
-      font-size: 14px;
-      line-height: 1.85;
-      color: #333;
-      margin-bottom: 16px;
+    .brand-name span { font-weight: 400; color: rgba(255,255,255,.7); margin-left: 4px; }
+    .app-nav { margin-left: auto; display: flex; gap: 4px; }
+    .app-nav a {
+      font: 500 13px var(--font-jp);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      color: rgba(255,255,255,0.8);
+      white-space: nowrap;
+      transition: background .15s, color .15s;
     }
-    .detail-desc p { margin-bottom: 10px; }
-    .detail-desc strong { color: #0c51a0; }
-    .detail-img {
-      width: 100%;
-      max-width: 560px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      display: block;
-      margin: 8px 0 16px;
+    .app-nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .app-nav a.active { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* ── ステージ（モニター装飾 + メインコンテンツ） ── */
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      overflow: hidden;
     }
 
-    .placeholder {
+    /* ── モニター装飾（panel-for-word-web の .mockup を流用） ── */
+    .monitor {
+      flex: none;
+      align-self: center;
+      width: 1000px;
+      margin-left: -600px;
+      margin-right: 250px;
+      background: var(--dark-bg);
+      padding: 14px 14px 10px;
+      border-radius: 16px;
+      box-shadow: 0 30px 70px -30px rgba(20,20,40,.35);
+      pointer-events: none; /* ミニタスクペインだけ下で再度有効化 */
+      transform: scale(1.25);
+      transform-origin: left center;
+    }
+    .monitor-camera {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      margin: 0 auto 10px;
+    }
+    .monitor-screen {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1920 / 1080;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .monitor-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: left top;
+      display: block;
+    }
+
+    /* ミニタスクペイン（実配色をそのまま流用） */
+    .mini-pane {
+      position: absolute;
+      top: 92px;
+      right: 0;
+      width: 178px;
+      height: 443px;
+      display: flex;
+      flex-direction: column;
+      background: var(--real-tab-active-bg);
+      overflow: hidden;
+      pointer-events: auto;
+    }
+    .mini-header {
+      flex: none;
+      display: flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 6px;
+      background: var(--real-tabbar);
+    }
+    .mini-header span {
+      font: 700 7px var(--font-jp);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .mini-tabs {
+      flex: none;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 3px;
+      padding: 6px 6px 0;
+      margin-top: -1px;
+      background: var(--real-tabbar);
+    }
+    .mini-tab {
+      flex: 1;
+      font: 600 6px var(--font-jp);
+      padding: 2px 3px;
+      white-space: nowrap;
+      border: none;
+      border-radius: 3px 3px 0 0;
+      background: transparent;
+      color: var(--real-tab-inactive);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mini-tab.active { color: var(--real-tab-active-text); background: var(--real-tab-active-bg); }
+    .mini-grid {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 48px);
+      align-content: start;
+      gap: 5px;
+      padding: 6px;
+    }
+    .mini-card {
+      width: 48px;
+      height: 43px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100%;
-      gap: 12px;
-      color: #8aadcc;
-      font-size: 14px;
-      text-align: center;
+      gap: 2px;
+      padding: 4px 2px;
+      border: 1px solid var(--real-border);
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .mini-card .swatch { display: flex; align-items: center; justify-content: center; color: var(--real-tabbar); }
+    .mini-card .swatch svg { width: 13px; height: 13px; display: block; }
+    .mini-card .lbl { font-size: 6px; line-height: 1.15; text-align: center; color: var(--real-label); word-break: keep-all; }
+    .mini-card.active { background: var(--real-tabbar); border-color: var(--real-tabbar); }
+    .mini-card.active .swatch { color: #fff; }
+    .mini-card.active .lbl { color: #fff; }
+
+    @media (max-width: 1320px) { .monitor { display: none; } }
+
+    /* ── メインコンテンツ ── */
+    .content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      padding: 0 36px 0 16px;
+      gap: 24px;
+    }
+
+    .tab-rail {
+      flex: none;
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      padding: 22px 4px;
+      overflow-y: auto;
+    }
+    .tab-pill {
+      font: 600 12.5px var(--font-jp);
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: var(--c-ink-55);
+      border-radius: 10px;
+      padding: 9px 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .tab-pill:hover { background: var(--c-primary-soft); }
+    .tab-pill.active { background: var(--c-primary); color: #fff; }
+
+    .feature-list-col {
+      flex: 1;
+      min-width: 260px;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 0;
+      min-height: 0;
+    }
+    .feature-list-col__head h1 { font: 700 18px var(--font-jp); color: var(--c-ink); margin-bottom: 4px; }
+    .feature-list-col__head p { font: 400 13px var(--font-jp); color: var(--c-ink-55); line-height: 1.7; margin-bottom: 12px; }
+    .feature-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-top: 1px solid var(--c-ink-08);
+      padding-top: 8px;
+    }
+    .feature-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 12px;
+      border-left: 3px solid transparent;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      outline: none;
+    }
+    .feature-row:hover { background: var(--c-primary-soft); }
+    .feature-row .label { font: 600 12.5px var(--font-jp); color: var(--c-ink); }
+    .feature-row .desc { font: 400 11.5px var(--font-jp); color: var(--c-ink-55); line-height: 1.5; }
+    .feature-row.active { background: var(--c-primary-soft); border-left-color: var(--c-primary); }
+    .feature-row.active .label { font-weight: 700; }
+    .feature-row.active .desc { color: var(--c-ink-70); }
+    .feature-row:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+
+    .detail-col {
+      flex: 1;
+      min-width: 420px;
+      padding: 22px 0 22px 26px;
+      border-left: 1px solid var(--c-ink-08);
+      overflow-y: auto;
+    }
+    .detail-col .eyebrow { font: 700 12px var(--font-jp); color: var(--c-primary); letter-spacing: .03em; }
+    .detail-col h2 { font: 700 24px var(--font-jp); color: var(--c-ink); margin: 8px 0 12px; }
+    .detail-desc { font: 400 14px var(--font-jp); color: var(--c-ink-70); line-height: 1.85; margin-bottom: 4px; }
+    .detail-desc p { margin-bottom: 10px; }
+    .detail-desc strong { color: var(--c-primary); }
+    .detail-img { width: 100%; border-radius: 8px; border: 1px solid var(--c-ink-10); display: block; margin: 10px 0; cursor: zoom-in; }
+    .detail-imgs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0; }
+    .detail-imgs .detail-img { margin: 0; }
+    .img-zoom-preview {
+      position: fixed;
+      z-index: 1000;
+      border-radius: 8px;
+      border: 1px solid var(--c-ink-10);
+      box-shadow: 0 12px 32px rgba(20,20,40,.25);
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(.96);
+      transition: opacity .15s ease, transform .15s ease;
+      object-fit: cover;
+    }
+    .img-zoom-preview.show { opacity: 1; transform: scale(1); }
+    .detail-img-fallback {
+      height: 160px;
+      border-radius: 8px;
+      border: 1px solid var(--c-ink-10);
+      background: repeating-linear-gradient(135deg,#EEF0F4,#EEF0F4 10px,#E4E7ED 10px,#E4E7ED 20px);
+      margin: 10px 0;
+    }
+
+    /* ── フッター ── */
+    .app-footer {
+      flex: none;
+      display: flex;
+      align-items: center;
+      padding: 10px 32px;
+      background: #fff;
+      border-top: 1px solid var(--c-ink-10);
+    }
+    .app-footer span { font: 400 11px var(--font-jp); color: var(--c-ink-45); }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 860px) {
+      body { height: auto; overflow: visible; }
+      .stage { overflow: visible; }
+      .content { flex-direction: column; padding: 0 20px; }
+      .tab-rail { flex-direction: row; flex-wrap: wrap; width: auto; }
+      .detail-col { width: 100%; min-width: 0; border-left: none; border-top: 1px solid var(--c-ink-08); padding: 22px 0; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <span class="logo">かんたんツールパネル for Word <span class="logo-sub">— 株式会社明友社</span></span>
-  <nav>
+<header class="app-header">
+  <img src="images/icon-32.png" alt="" class="brand-badge">
+  <div class="brand-name">かんたんツールパネル<span>for Word</span></div>
+  <nav class="app-nav">
     <a href="about.html" class="active">機能詳細</a>
     <a href="support.html">アドインについて</a>
   </nav>
 </header>
 
-<div class="layout">
-  <div class="left-pane">
-    <div class="tab-bar" id="tabBar"></div>
-    <div class="left-pane-content" id="leftContent"></div>
-  </div>
-  <div class="right-pane" id="rightPane">
-    <div class="placeholder">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="#c5dcf5" stroke-width="1.5"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="#c5dcf5" stroke-width="1.5"/><line x1="9" y1="12" x2="15" y2="12" stroke="#c5dcf5" stroke-width="1.3" stroke-linecap="round"/><line x1="9" y1="15" x2="13" y2="15" stroke="#c5dcf5" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <span>← 左のカードを選択してください</span>
+<div class="stage">
+  <div class="monitor" aria-hidden="true">
+    <span class="monitor-camera"></span>
+    <div class="monitor-screen">
+      <img src="images/panel-screenshot.png" alt="">
+      <div class="mini-pane">
+        <div class="mini-header"><span>かんたんツールパネル</span></div>
+        <div class="mini-tabs" id="miniTabs"></div>
+        <div class="mini-grid" id="miniGrid"></div>
+      </div>
     </div>
   </div>
+
+  <div class="content">
+    <nav class="tab-rail" id="tabRail"></nav>
+
+    <section class="feature-list-col">
+      <div class="feature-list-col__head">
+        <h1 id="tabTitle"></h1>
+        <p id="tabDesc"></p>
+      </div>
+      <div class="feature-list" id="featureList"></div>
+    </section>
+
+    <aside class="detail-col" id="detailCol"></aside>
+  </div>
 </div>
+
+<footer class="app-footer">
+  <span>© 株式会社明友社</span>
+</footer>
+
+<img id="imgZoomPreview" class="img-zoom-preview" alt="">
 
 <script>
 // ─── アイコン SVG 文字列 ───────────────────────────────────────────────────────
@@ -314,129 +424,170 @@ const I = {
   matrix:   `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6,3 L4,3 L4,21 L6,21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M18,3 L20,3 L20,21 L18,21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><text x="7.5" y="11" font-size="6.5" font-family="sans-serif" font-weight="600" fill="currentColor">1</text><text x="13" y="11" font-size="6.5" font-family="sans-serif" font-weight="600" fill="currentColor">0</text><text x="7.5" y="19" font-size="6.5" font-family="sans-serif" font-weight="600" fill="currentColor">0</text><text x="13" y="19" font-size="6.5" font-family="sans-serif" font-weight="600" fill="currentColor">1</text></svg>`,
   docText:  `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 2h8l4 4v16H6V2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 2v4h4" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="9" y1="15" x2="13" y2="15" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
   emoji:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/><path d="M8.5,14.5 C9.5,17 14.5,17 15.5,14.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`,
+  star:     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7L12 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/></svg>`,
 }
 
 // ─── タブ定義 ────────────────────────────────────────────────────────────────
 const TABS = [
-  { id: 'favorites',  label: '★' },
-  { id: 'basic',      label: '基本設定' },
-  { id: 'typography', label: '文字組' },
-  { id: 'border',     label: '枠' },
-  { id: 'formula',    label: '数式' },
-  { id: 'template',   label: '定型文' },
+  { id: 'favorites',  label: '★',       desc: 'よく使う機能をまとめて呼び出せます。' },
+  { id: 'basic',      label: '基本設定', desc: 'ページ設定や変更履歴など、文書全体の基本管理を行います。' },
+  { id: 'typography', label: '文字組',   desc: 'インデントや行間、ルビなど文字組みを整えます。' },
+  { id: 'border',     label: '枠',       desc: '画像や図形を文書内に配置します。' },
+  { id: 'formula',    label: '数式',     desc: '分数や積分などの数式テンプレートを挿入します。' },
+  { id: 'template',   label: '定型文',   desc: '定型文や記号をスロットに登録して呼び出します。' },
 ]
 
 // ─── 機能定義 ────────────────────────────────────────────────────────────────
 const FEATURES = [
+  // お気に入り
+  { id: 'fav-usage',       tabId: 'favorites',  label: 'お気に入り',  icon: I.star,
+    listDesc: 'よく使う機能カードを登録・並び替えできる説明ページです。',
+    desc: `<p>よく使う機能を素早くアクセスできるようにする機能です。</p><p><strong>登録方法①</strong>：各機能カード右上の ★ アイコンをクリック</p><p><strong>登録方法②</strong>：各機能カード内の「お気に入りに登録」ボタンをクリック</p><p>お気に入りタブではドラッグ＆ドロップで並び順を変更できます。</p>`,
+    imgs: ['images/favorites-1.png', 'images/favorites-2.png'] },
+
   // 基本設定
   { id: 'page-settings',   tabId: 'basic',      label: 'ページ設定確認',      icon: I.info,
+    listDesc: '用紙サイズ・余白・文字サイズの現状を一覧で確認できます。',
     desc: `<p>印刷前や他者からファイルを受け取った際に、用紙サイズ・余白・文字サイズが意図した設定になっているかをすばやく確認できます。</p>`,
     imgs: ['images/page-settings.png'] },
   { id: 'paper-size',      tabId: 'basic',      label: '用紙サイズ',          icon: I.doc,
+    listDesc: '用紙サイズを変更します。',
     desc: `<p>現在のドキュメントのページサイズをプルダウンから選択し変更します。</p>`,
     imgs: ['images/paper-size.png'] },
   { id: 'font-size',       tabId: 'basic',      label: '文字サイズ',          icon: I.fontSize,
+    listDesc: '選択したテキストの文字サイズを設定します。',
     desc: `<p>対象テキストを選択後、文字サイズの数値を設定することができます。</p>`,
     imgs: ['images/font-size.png'] },
   { id: 'page-margin',     tabId: 'basic',      label: 'ページ余白',          icon: I.margin,
+    listDesc: '上下左右の余白をmm単位で設定します。',
     desc: `<p>上下左右の余白をmm単位で設定することができます。</p>`,
     imgs: ['images/page-margin.png'] },
   { id: 'columns',         tabId: 'basic',      label: '段組み',              icon: I.cols,
+    listDesc: '選択範囲を複数列レイアウトにします。',
     desc: `<p>新聞・チラシ・会報誌など、紙面を複数列に分けて見やすくしたい場合に使用します。選択範囲に段組みを設定することができます。</p>`,
     imgs: ['images/column-layout.png'] },
   { id: 'chars-lines',     tabId: 'basic',      label: '文字数・行数',        icon: I.chars,
+    listDesc: '1行の文字数・1ページの行数を固定します。',
     desc: `<p>原稿用紙や社内規定フォーマットなど、1行の文字数・1ページの行数が決まっている文書を作成する際に使用します。1行に入る文字数・1ページに入る行数を設定できます。</p>`,
     imgs: ['images/chars-lines.png'] },
   { id: 'style-management',tabId: 'basic',      label: 'スタイル管理',        icon: I.style,
+    listDesc: '書式状況をスキャンし、正規化します。',
     desc: `<p>「文書をスキャンして書式状況を確認」を押下すると、書式状況の一覧が表示されます。</p><p>スタイルが当たっている／スタイルが上書きされている／未設定の３つの項目が表示されており、意図しない書式が当たっているテキストを正規化することができます。</p><p><strong>ステップ１</strong>：文書をスキャンし、スタイルを検索</p>`,
     imgs: ['images/style-management-1.png', 'images/style-management-2.png'] },
   { id: 'toc-update',      tabId: 'basic',      label: '目次・フィールド更新', icon: I.toc,
+    listDesc: '目次やフィールドを一括更新します。',
     desc: `<p>目次および文章内のフィールドを最新の状態に一括更新します。</p>`,
     imgs: ['images/toc-update.png'] },
   { id: 'tracked-changes', tabId: 'basic',      label: '変更履歴管理',        icon: I.track,
+    listDesc: '記録開始・件数確認・一括承認を行います。',
     desc: `<p>「変更の記録を開始」ボタンを押下すると変更が記録され始めます。</p><p>「変更履歴の件数を確認」ボタンを押下すると下部に一覧表示され、「全て承認する」ボタンから変更を確定することができます。</p>`,
     imgs: ['images/tracked-changes.png'] },
   { id: 'comments-manage', tabId: 'basic',      label: 'コメント管理',        icon: I.comment,
+    listDesc: '件数確認・一括解決済みにできます。',
     desc: `<p>校閲・レビューが完了した後、残ったコメントをまとめて整理したいときに使用します。「コメント件数を確認」ボタンを押下すると件数が表示され、「全て解決済みにする」ボタンからコメントを一括で解決済みにすることができます。</p>`,
     imgs: ['images/comments.png'] },
   { id: 'header-footer',   tabId: 'basic',      label: 'ヘッダー/フッター',   icon: I.hf,
+    listDesc: '個別ページ設定・ページ番号設定を行います。',
     desc: `<p><strong>個別ページ設定</strong><br>ヘッダーフッターの設定方法を選択し、入力することができます。例：奇数ページ・中央・「MEIYUSHA」フッター入力</p><p><strong>ページ番号設定</strong><br>設定方法を選択し、ページ番号を挿入することができます。</p>`,
     imgs: ['images/header-footer-1.png', 'images/header-footer-2.png'] },
   { id: 'figure-caption',  tabId: 'basic',      label: '図表番号',            icon: I.caption,
+    listDesc: '図表番号・相互参照を一括更新します。',
     desc: `<p>図や表を追加・削除・並び替えした後に番号がずれた場合、一括で正しい通し番号に更新します。相互参照も同時に更新されます。</p>`,
     imgs: ['images/figure-caption.png'] },
   { id: 'page-break',      tabId: 'basic',      label: '改ページ制御',        icon: I.pgbreak,
+    listDesc: '選択段落に改ページを適用します。',
     desc: `<p>章の見出しや重要な段落を必ず新しいページから始めたい場合に使用します。選択した段落に改ページ設定を適用します。</p>`,
     imgs: ['images/page-break.png'] },
   { id: 'footnote',        tabId: 'basic',      label: '脚注管理',            icon: I.footnote,
+    listDesc: '脚注の一覧を表示します。',
     desc: `<p>文書内に散在する脚注を一覧で把握したいときに使用します。「件数を確認・一覧表示」を押下すると、下部に一覧が作成されます。</p>`,
     imgs: ['images/footnote-1.png', 'images/footnote-2.png'] },
 
   // 文字組
   { id: 'indent',          tabId: 'typography', label: 'インデント',          icon: I.indent,
+    listDesc: '左・最初の行・右インデントを設定します。',
     desc: `<p>選択した段落の左・最初の行・右のインデントを設定できます。</p>`,
     imgs: ['images/indent.png'] },
   { id: 'line-spacing',    tabId: 'typography', label: '行間',                icon: I.lineSp,
+    listDesc: '選択行の行間を設定します。',
     desc: `<p>文書の読みやすさを調整したり、印刷時のページ収まりを整えたいときに使用します。選択行の行間を設定できます。</p>`,
     imgs: ['images/line-spacing.png'] },
   { id: 'table-insert',    tabId: 'typography', label: '表',                  icon: I.table,
+    listDesc: '行数・列数を指定して表を作成します。',
     desc: `<p>行数・列数を指定して表を作成します。</p>`,
     imgs: ['images/table-insert.png'] },
   { id: 'font-replace',    tabId: 'typography', label: 'フォント検索・置換',  icon: I.fontRep,
+    listDesc: '使用フォント一覧を取得し、一括置換します。',
     desc: `<p>他者から受け取ったファイルに意図しないフォントが混在しているときや、フォントを統一したいときに使用します。</p><p>「取得」ボタンを押下するとドキュメントに使用されているフォント一覧が左窓に表示されます。変換元・変換先フォントを入力し「フォント置換」ボタンから実行することで置換することができます。</p>`,
     imgs: ['images/font-replace.png'] },
   { id: 'auto-ruby',       tabId: 'typography', label: 'ルビ',                icon: I.ruby,
+    listDesc: '自動/任意でルビを付与・解除します。',
     desc: `<p>ルビ処理したい文字をカーソルで選択し「実行（自動ルビ）」ボタンを押してください。文字単位ごとにルビを振ることができます。</p><p>任意で入力する場合は「ルビ入力（任意）」をご利用ください。ルビが振られているテキストを選択して「ルビを解除」から解除することもできます。</p>`,
     imgs: ['images/ruby.png'] },
 
   // 枠
   { id: 'image-insert',    tabId: 'border',     label: '画像挿入',            icon: I.image,
+    listDesc: '画像/図形ファイルを配置します。',
     desc: `<p>画像、図形ファイルなどを選択し、ドキュメント上に配置します。配置後は「レイアウトオプション」より、必要に応じて文字の折り返しを指定してください。</p>`,
     imgs: ['images/image-insert.png'] },
   { id: 'shape-insert',    tabId: 'border',     label: '図形',                icon: I.shape,
+    listDesc: 'テキスト枠/長方形をサイズ指定で作成します。',
     desc: `<p>テキスト枠または長方形を文章中のカーソルに合わせて文字・行数、または数値で枠を作成します。配置後は「レイアウトオプション」より、必要に応じて文字の折り返しを指定してください。</p><p>枠の種類（テキスト枠 / 長方形）を選択し、「サイズパレット」よりサイズ変更も可能です。</p>`,
     imgs: ['images/shapes.png'] },
 
   // 数式
   { id: 'formula-fraction', tabId: 'formula',   label: '分数',                icon: I.frac,
+    listDesc: '分数テンプレートを挿入します。',
     desc: `<p>分数の数式（例：x/y）を挿入します。カーソル位置に数式エディタの分数テンプレートが挿入されます。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-script',   tabId: 'formula',   label: '上付き・下付き',      icon: I.script,
+    listDesc: '指数・添字テンプレートを挿入します。',
     desc: `<p>上付き文字（指数）・下付き文字（添字）の数式テンプレートを挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-radical',  tabId: 'formula',   label: 'べき乗根',            icon: I.radical,
+    listDesc: '平方根・n乗根を挿入します。',
     desc: `<p>平方根（√）・立方根などの根号を挿入します。次数を指定した n 乗根にも対応します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-integral', tabId: 'formula',   label: '積分',                icon: I.integral,
+    listDesc: '∫∬∭ テンプレートを挿入します。',
     desc: `<p>積分（∫）・二重積分（∬）・三重積分（∭）など各種積分記号のテンプレートを挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-large-op', tabId: 'formula',   label: '大型演算子',          icon: I.largeOp,
+    listDesc: 'Σ・Π・∪・∩ を挿入します。',
     desc: `<p>総和（Σ）・積（Π）・和集合（∪）・積集合（∩）などの大型演算子を挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-bracket',  tabId: 'formula',   label: 'かっこ',              icon: I.bracket,
+    listDesc: '場合分け・二項係数用のかっこ構造を挿入します。',
     desc: `<p>場合分け・二項係数などのかっこ構造（丸かっこ・角かっこ・波かっこ）を挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-trig',     tabId: 'formula',   label: '関数',                icon: I.trig,
+    listDesc: 'sin/cos/tan等の三角関数を挿入します。',
     desc: `<p>sin・cos・tan・cot などの三角関数テンプレートを挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-func',     tabId: 'formula',   label: '極限と対数',          icon: I.func,
+    listDesc: 'lim・log・ln テンプレートを挿入します。',
     desc: `<p>極限（lim）・対数（log）・自然対数（ln）などの関数テンプレートを挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-accent',   tabId: 'formula',   label: 'アクセント',          icon: I.accent,
+    listDesc: 'ベクトル・オーバーライン・ハット等を挿入します。',
     desc: `<p>ベクトル（→）・オーバーライン（ˉ）・ハット（ˆ）・ドット（·）などのアクセント記号を挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-operator', tabId: 'formula',   label: '演算子',              icon: I.operator,
+    listDesc: '≠≤≥±∈∞等の特殊記号を挿入します。',
     desc: `<p>≠・≤・≥・±・∈・∞ などの特殊演算子・等号記号を挿入します。</p>`,
     imgs: ['images/formula.png'] },
   { id: 'formula-matrix',   tabId: 'formula',   label: '行列',                icon: I.matrix,
+    listDesc: '2×2行列テンプレートを挿入します。',
     desc: `<p>2×2 行列テンプレートを挿入します。各成分を入力して行列式を作成できます。</p>`,
     imgs: ['images/formula.png'] },
 
   // 定型文
   { id: 'template-text',   tabId: 'template',   label: '定型文入力',          icon: I.docText,
+    listDesc: 'スロット登録したテキストを挿入、または文章からコピー登録します。',
     desc: `<p>あらかじめスロットに入力したテキストを定型文として挿入することができます。</p><p>スロットを選択した状態で「文章よりコピー登録」を選択すると、ドキュメント内のテキストを定型文として登録することができます。</p>`,
     imgs: ['images/template-text.png'] },
   { id: 'template-symbol', tabId: 'template',   label: '記号スロット',        icon: I.emoji,
+    listDesc: '丸数字等の連番を入力します。',
     desc: `<p>あらかじめ4種の括弧付き数字や丸付き数字などを登録しておき、「実行」ボタンを押すと連番入力することができます。</p><p>例：⑴ → ⑵ → ⑶ → ⑷ …</p>`,
     imgs: ['images/symbol-series.png'] },
 ]
@@ -445,107 +596,151 @@ const FEATURES = [
 let currentTab = 'basic'
 let currentFeatureId = null
 
+// ─── 共通ヘルパー ──────────────────────────────────────────────────────────────
+function handleImgError(img) {
+  const fallback = document.createElement('div')
+  fallback.className = 'detail-img-fallback'
+  img.replaceWith(fallback)
+}
+
 // ─── レンダリング ─────────────────────────────────────────────────────────────
-function renderTabs() {
-  const tabBar = document.getElementById('tabBar')
-  tabBar.innerHTML = TABS.map(t =>
-    `<button class="tab-btn${t.id === currentTab ? ' active' : ''}" data-tab="${t.id}">${t.label}</button>`
+function currentFeatures() {
+  return FEATURES.filter(f => f.tabId === currentTab)
+}
+
+function renderTabs(containerId, className, extraAttrs = '') {
+  const el = document.getElementById(containerId)
+  el.innerHTML = TABS.map(t =>
+    `<button class="${className}${t.id === currentTab ? ' active' : ''}" data-tab="${t.id}"${extraAttrs}>${t.label}</button>`
   ).join('')
-  tabBar.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentTab = btn.dataset.tab
-      currentFeatureId = null
-      renderTabs()
-      renderLeft()
-      if (currentTab !== 'favorites') {
-        const first = FEATURES.find(f => f.tabId === currentTab)
-        if (first) selectFeature(first.id)
-      } else {
-        renderFavoritesRight()
-      }
+  el.querySelectorAll(`.${className}`).forEach(btn => {
+    btn.addEventListener('click', () => selectTab(btn.dataset.tab))
+  })
+}
+
+function renderTabRail() {
+  renderTabs('tabRail', 'tab-pill')
+}
+
+function renderMiniTabs() {
+  renderTabs('miniTabs', 'mini-tab', ' tabindex="-1"')
+}
+
+function renderFeatureList() {
+  const tab = TABS.find(t => t.id === currentTab)
+  document.getElementById('tabTitle').textContent = tab ? tab.label : ''
+  document.getElementById('tabDesc').textContent = tab ? tab.desc : ''
+
+  const list = document.getElementById('featureList')
+  list.innerHTML = currentFeatures().map(f => `
+    <div class="feature-row${currentFeatureId === f.id ? ' active' : ''}" data-id="${f.id}" tabindex="0" role="button" aria-label="${f.label}">
+      <span class="label">${f.label}</span>
+      <span class="desc">${f.listDesc}</span>
+    </div>`).join('')
+  list.querySelectorAll('.feature-row').forEach(row => {
+    row.addEventListener('click', () => selectFeature(row.dataset.id))
+    row.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFeature(row.dataset.id) }
     })
   })
 }
 
-function renderLeft() {
-  const el = document.getElementById('leftContent')
-  if (currentTab === 'favorites') {
-    el.innerHTML = `
-      <div class="favorites-text">
-        <h3>★ お気に入り機能</h3>
-        <p>よく使う機能カードを「お気に入り」タブに追加することで、機能を探す手間を省けます。</p>
-        <p>登録方法は2通りあります：</p>
-        <ul>
-          <li>各機能カード右上の <strong>★</strong> アイコンをクリック</li>
-          <li>各機能カード内の「お気に入りに登録」ボタンをクリック</li>
-        </ul>
-        <p style="margin-top:8px;">お気に入りタブではドラッグ＆ドロップで並び順を変更できます。</p>
-      </div>
-    `
-    return
-  }
-  const features = FEATURES.filter(f => f.tabId === currentTab)
-  el.innerHTML = `<div class="card-grid">${features.map(f => `
-    <div class="feature-card${currentFeatureId === f.id ? ' active' : ''}" data-id="${f.id}" tabindex="0" role="button" aria-label="${f.label}">
-      <div class="card-icon">${f.icon}</div>
-      <span class="card-label">${f.label}</span>
-    </div>`).join('')}</div>`
-  el.querySelectorAll('.feature-card').forEach(card => {
+function renderMiniGrid() {
+  const grid = document.getElementById('miniGrid')
+  grid.innerHTML = currentFeatures().map(f => `
+    <div class="mini-card${currentFeatureId === f.id ? ' active' : ''}" data-id="${f.id}" tabindex="-1">
+      <span class="swatch">${f.icon}</span>
+      <span class="lbl">${f.label}</span>
+    </div>`).join('')
+  grid.querySelectorAll('.mini-card').forEach(card => {
     card.addEventListener('click', () => selectFeature(card.dataset.id))
-    card.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFeature(card.dataset.id) }
-    })
   })
 }
 
-function selectFeature(id) {
-  currentFeatureId = id
+function renderDetail(id) {
   const feature = FEATURES.find(f => f.id === id)
   if (!feature) return
+  const tab = TABS.find(t => t.id === feature.tabId)
 
-  document.querySelectorAll('.feature-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.id === id)
-  })
-
-  const imgsHtml = feature.imgs.map(src =>
-    `<img src="${src}" alt="${feature.label}" class="detail-img" onerror="this.style.display='none'">`
+  const imgsInner = feature.imgs.map(src =>
+    `<img src="${src}" alt="${feature.label}" class="detail-img" onerror="handleImgError(this)">`
   ).join('')
+  const imgsHtml = `<div class="detail-imgs">${imgsInner}</div>`
 
-  const right = document.getElementById('rightPane')
-  right.scrollTop = 0
-  right.innerHTML = `
-    <div class="detail-header">
-      <div class="detail-icon">${feature.icon}</div>
-      <h2 class="detail-title">${feature.label}</h2>
-    </div>
+  const col = document.getElementById('detailCol')
+  col.scrollTop = 0
+  col.innerHTML = `
+    <div class="eyebrow">${tab ? tab.label : ''}</div>
+    <h2>${feature.label}</h2>
     <div class="detail-desc">${feature.desc}</div>
     ${imgsHtml}
   `
 }
 
-function renderFavoritesRight() {
-  const right = document.getElementById('rightPane')
-  right.scrollTop = 0
-  right.innerHTML = `
-    <div class="detail-header">
-      <div class="detail-icon" style="font-size:24px;">★</div>
-      <h2 class="detail-title">お気に入りの使い方</h2>
-    </div>
-    <div class="detail-desc">
-      <p>よく使う機能を素早くアクセスできるようにする機能です。</p>
-      <p><strong>登録方法①</strong>：各機能カード右上の ★ アイコンをクリック</p>
-    </div>
-    <img src="images/favorites-1.png" alt="お気に入り登録①" class="detail-img" onerror="this.style.display='none'">
-    <div class="detail-desc" style="margin-top:8px;">
-      <p><strong>登録方法②</strong>：各機能カード内の「お気に入りに登録」ボタンをクリック</p>
-    </div>
-    <img src="images/favorites-2.png" alt="お気に入り登録②" class="detail-img" onerror="this.style.display='none'">
-  `
+function selectTab(tabId) {
+  currentTab = tabId
+  currentFeatureId = null
+  renderTabRail()
+  renderMiniTabs()
+  renderFeatureList()
+  renderMiniGrid()
+  const first = FEATURES.find(f => f.tabId === currentTab)
+  if (first) selectFeature(first.id)
 }
 
+function selectFeature(id) {
+  currentFeatureId = id
+  document.querySelectorAll('.feature-row').forEach(el => el.classList.toggle('active', el.dataset.id === id))
+  document.querySelectorAll('.mini-card').forEach(el => el.classList.toggle('active', el.dataset.id === id))
+  renderDetail(id)
+}
+
+// ─── 画像ホバー拡大プレビュー ───────────────────────────────────────────────────
+let zoomTimer = null
+const zoomPreview = document.getElementById('imgZoomPreview')
+
+function showZoom(img) {
+  const rect = img.getBoundingClientRect()
+  const scale = 1.5
+  const w = rect.width * scale
+  const h = rect.height * scale
+  const margin = 8
+  let left = rect.left - (w - rect.width) / 2
+  let top = rect.top
+  if (left < margin) left = margin
+  if (left + w > window.innerWidth - margin) left = window.innerWidth - margin - w
+  if (top + h > window.innerHeight - margin) top = window.innerHeight - margin - h
+  if (top < margin) top = margin
+  zoomPreview.src = img.src
+  zoomPreview.style.left = `${left}px`
+  zoomPreview.style.top = `${top}px`
+  zoomPreview.style.width = `${w}px`
+  zoomPreview.style.height = `${h}px`
+  zoomPreview.classList.add('show')
+}
+
+function hideZoom() {
+  zoomPreview.classList.remove('show')
+}
+
+document.addEventListener('mouseover', (e) => {
+  const img = e.target.closest('.detail-img')
+  if (!img) return
+  clearTimeout(zoomTimer)
+  zoomTimer = setTimeout(() => showZoom(img), 400)
+})
+document.addEventListener('mouseout', (e) => {
+  const img = e.target.closest('.detail-img')
+  if (!img) return
+  clearTimeout(zoomTimer)
+  hideZoom()
+})
+
 // ─── 初期化 ──────────────────────────────────────────────────────────────────
-renderTabs()
-renderLeft()
+renderTabRail()
+renderMiniTabs()
+renderFeatureList()
+renderMiniGrid()
 const firstFeature = FEATURES.find(f => f.tabId === currentTab)
 if (firstFeature) selectFeature(firstFeature.id)
 </script>
